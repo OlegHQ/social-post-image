@@ -8,8 +8,8 @@ import {
   createTypographyShowcase,
   createHotTakePoster,
   createAnnouncementPoster,
-  createOperaPoster,
-  createSeasonPoster,
+  createShowcasePoster,
+  createContentGridPoster,
   createFeatureShowcase,
 } from '@/components/composer';
 import { presetSchemas } from '@/schemas/presetSchemas';
@@ -23,8 +23,8 @@ const presetFunctions: Record<string, (options: Record<string, unknown>) => Post
   'typography-showcase': (options) => createTypographyShowcase(options as unknown as Parameters<typeof createTypographyShowcase>[0]),
   'hot-take-poster': (options) => createHotTakePoster(options as unknown as Parameters<typeof createHotTakePoster>[0]),
   'announcement-poster': (options) => createAnnouncementPoster(options as unknown as Parameters<typeof createAnnouncementPoster>[0]),
-  'opera-poster': (options) => createOperaPoster(options as unknown as Parameters<typeof createOperaPoster>[0]),
-  'season-poster': (options) => createSeasonPoster(options as unknown as Parameters<typeof createSeasonPoster>[0]),
+  'showcase-poster': (options) => createShowcasePoster(options as unknown as Parameters<typeof createShowcasePoster>[0]),
+  'content-grid-poster': (options) => createContentGridPoster(options as unknown as Parameters<typeof createContentGridPoster>[0]),
   'feature-showcase': (options) => createFeatureShowcase(options as unknown as Parameters<typeof createFeatureShowcase>[0]),
 };
 

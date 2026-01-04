@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { streamOpenRouter, parseLLMVariants } from '@/lib/openrouter';
+import { streamOpenRouter, parseLLMResponse } from '@/lib/openrouter';
 import {
   templateSpecs,
   themeReference,
@@ -17,76 +17,73 @@ interface GenerateRequest {
 }
 
 /**
- * Build system prompt for selected templates
+ * Build system prompt for a single template
  */
-function buildSystemPrompt(selectedTemplates: string[]): string {
-  // Build compact JSON specs for each selected template
-  const templateJsonSpecs = selectedTemplates
-    .filter((id) => templateSpecs[id])
-    .map((id) => {
-      const spec = templateSpecs[id];
-      const fields: Record<string, { required: boolean; maxChars?: number; type?: string; description: string }> = {};
+function buildSingleTemplateSystemPrompt(templateId: string): string {
+  const spec = templateSpecs[templateId];
+  if (!spec) {
+    throw new Error(`Unknown template: ${templateId}`);
+  }
 
-      for (const [key, guide] of Object.entries(spec.fieldGuides)) {
-        fields[key] = {
-          required: guide.required || false,
-          ...(guide.maxChars && { maxChars: guide.maxChars }),
-          ...(guide.type && { type: guide.type }),
-          description: guide.description,
-        };
-      }
+  const fields: Record<string, { required: boolean; maxChars?: number; type?: string; description: string }> = {};
+  for (const [key, guide] of Object.entries(spec.fieldGuides)) {
+    fields[key] = {
+      required: guide.required || false,
+      ...(guide.maxChars && { maxChars: guide.maxChars }),
+      ...(guide.type && { type: guide.type }),
+      description: guide.description,
+    };
+  }
 
-      return {
-        id,
-        description: spec.description,
-        bestFor: spec.bestFor.slice(0, 2),
-        fields,
-        example: spec.exampleConfig,
-      };
-    });
+  const templateSpec = {
+    id: templateId,
+    description: spec.description,
+    bestFor: spec.bestFor,
+    fields,
+    example: spec.exampleConfig,
+  };
 
   const themeSummaries = Object.entries(themeReference)
     .map(([id, info]) => `${id}: ${info.mood}`)
     .join(', ');
 
-  const variantCount = templateJsonSpecs.length;
+  return `You are an expert Swiss design assistant. Create a LinkedIn post illustration using the "${templateId}" template.
 
-  return `You are an expert Swiss design assistant. Create LinkedIn post illustrations.
+TEMPLATE SPECIFICATION:
+${JSON.stringify(templateSpec, null, 2)}
 
-TEMPLATES (JSON spec):
-${JSON.stringify(templateJsonSpecs, null, 2)}
+AVAILABLE THEMES: ${themeSummaries}
 
-THEMES: ${themeSummaries}
-
-TASK: Generate ${variantCount} design${variantCount !== 1 ? 's' : ''}, one for each template listed above. Extract content DIRECTLY from the post.
+TASK: Generate ONE design configuration for this template. Extract content DIRECTLY from the provided post.
 
 OUTPUT (JSON only):
 {
-  "variants": [
-${templateJsonSpecs.map((t) => `    { "templateId": "${t.id}", "theme": "...", "config": {...}, "reasoning": "..." }`).join(',\n')}
-  ]
+  "templateId": "${templateId}",
+  "theme": "theme-id-here",
+  "config": { /* all required fields */ },
+  "reasoning": "Brief explanation of design choices"
 }
 
 RULES:
-- Generate exactly ONE design per template listed above
-- Include ALL required fields for each template
-- Pick the most appropriate theme for each template
+- Include ALL required fields for this template
+- Pick the most appropriate theme for the content
 - Extract headlines/quotes from the ACTUAL post content
 - For vignelli-quote: emphasisPhrase MUST be exact substring of quote
 - Use \\n for line breaks in headlines
-- Content must reflect the post's actual topic - DO NOT invent unrelated content`;
+- Content must reflect the post's actual topic - DO NOT invent unrelated content
+- Focus on quality over speed - make this design excellent`;
 }
 
 /**
- * Build user prompt with post content and preferences
+ * Build user prompt for a single template
  */
-function buildUserPrompt(postText: string, selectedTemplates: string[], author?: string): string {
+function buildSingleTemplateUserPrompt(postText: string, templateId: string, author?: string): string {
   let prompt = `POST CONTENT:
 """
 ${postText}
 """
 
-IMPORTANT: Generate content that reflects THIS post's actual topic and message.
+Generate a "${templateId}" design that captures the essence of this post.
 Extract key phrases and insights directly from the text above.
 `;
 
@@ -94,7 +91,7 @@ Extract key phrases and insights directly from the text above.
     prompt += `Author: ${author}\n`;
   }
 
-  prompt += `\nGenerate ${selectedTemplates.length} design${selectedTemplates.length !== 1 ? 's' : ''} as JSON:`;
+  prompt += '\nRespond with JSON only:';
 
   return prompt;
 }
@@ -168,11 +165,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 3. Build prompts
-  const systemPrompt = buildSystemPrompt(selectedTemplates);
-  const userPrompt = buildUserPrompt(postText, selectedTemplates, preferences?.author);
-
-  // 4. Create SSE stream
+  // 3. Create SSE stream with per-template LLM calls
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -181,69 +174,72 @@ export async function POST(request: NextRequest) {
         controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
       };
 
+      const validatedVariants: Array<{ templateId: string; theme: string; config: Record<string, unknown>; reasoning: string }> = [];
+      const errors: string[] = [];
+
       try {
         // Send start event
         sendEvent('start', { message: 'Starting generation...', total: selectedTemplates.length });
 
-        // Stream LLM response
-        let fullContent = '';
-        let chunkCount = 0;
+        // Generate each template sequentially for better quality
+        for (let i = 0; i < selectedTemplates.length; i++) {
+          const templateId = selectedTemplates[i];
 
-        for await (const chunk of streamOpenRouter(systemPrompt, userPrompt)) {
-          fullContent += chunk;
-          chunkCount++;
+          sendEvent('progress', {
+            message: `Generating ${templateId}...`,
+            current: i + 1,
+            total: selectedTemplates.length,
+          });
 
-          // Send progress every 5 chunks to reduce overhead
-          if (chunkCount % 5 === 0) {
-            sendEvent('progress', {
-              message: 'Generating designs...',
-              chars: fullContent.length
-            });
+          try {
+            // Build prompts for this specific template
+            const systemPrompt = buildSingleTemplateSystemPrompt(templateId);
+            const userPrompt = buildSingleTemplateUserPrompt(postText, templateId, preferences?.author);
+
+            // Stream LLM response for this template
+            let fullContent = '';
+            for await (const chunk of streamOpenRouter(systemPrompt, userPrompt)) {
+              fullContent += chunk;
+            }
+
+            // Parse single variant response
+            const variant = parseLLMResponse(fullContent);
+
+            // Verify templateId matches
+            if (variant.templateId !== templateId) {
+              variant.templateId = templateId;
+            }
+
+            // Validate config
+            const validation = validateConfig(templateId, variant.config);
+            if (!validation.valid) {
+              errors.push(`${templateId}: ${validation.errors.join(', ')}`);
+              continue;
+            }
+
+            validatedVariants.push(variant);
+
+            // Send validated variant immediately
+            sendEvent('variant', { index: i, variant });
+          } catch (templateError) {
+            const errorMsg = templateError instanceof Error ? templateError.message : 'Unknown error';
+            errors.push(`${templateId}: ${errorMsg}`);
+            console.error(`Error generating ${templateId}:`, templateError);
+            // Continue with other templates
           }
-        }
-
-        // Parse complete response
-        sendEvent('progress', { message: 'Parsing response...' });
-
-        const variants = parseLLMVariants(fullContent);
-
-        // Validate each variant
-        const validatedVariants = [];
-        const errors: string[] = [];
-
-        for (let i = 0; i < variants.length; i++) {
-          const variant = variants[i];
-
-          // Check template was requested
-          if (!selectedTemplates.includes(variant.templateId)) {
-            errors.push(`Variant ${i + 1}: Template ${variant.templateId} was not requested`);
-            continue;
-          }
-
-          // Validate config
-          const validation = validateConfig(variant.templateId, variant.config);
-          if (!validation.valid) {
-            errors.push(`Variant ${i + 1}: ${validation.errors.join(', ')}`);
-            continue;
-          }
-
-          validatedVariants.push(variant);
-
-          // Send each validated variant immediately
-          sendEvent('variant', { index: i, variant });
         }
 
         // Send completion
         if (validatedVariants.length === 0) {
           sendEvent('error', {
-            error: `All variants invalid: ${errors.join('; ')}`,
-            code: 'VALIDATION_ERROR'
+            error: `All variants failed: ${errors.join('; ')}`,
+            code: 'VALIDATION_ERROR',
           });
         } else {
           sendEvent('complete', {
             success: true,
             variants: validatedVariants,
-            errors: errors.length > 0 ? errors : undefined
+            errors: errors.length > 0 ? errors : undefined,
           });
         }
       } catch (error) {

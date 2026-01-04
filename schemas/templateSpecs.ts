@@ -133,6 +133,12 @@ export const templateSpecs: Record<string, TemplateSpec> = {
         tips: 'Use sparingly. The value should be short and punchy (1-4 chars for numbers, 10-20 chars for text).',
         required: false,
       },
+      showAccentBox: {
+        description: 'Whether to display the accent box (only if accentBox data is provided).',
+        defaultValue: true,
+        required: false,
+        type: 'boolean',
+      },
       headlineVariant: {
         description: 'Typography size for headline.',
         examples: ['hero', 'display', 'headline'],
@@ -522,12 +528,13 @@ export const templateSpecs: Record<string, TemplateSpec> = {
         type: 'array',
       },
       bodyText: {
-        description: 'Descriptive body text about the typography.',
+        description: 'Supporting body text that reinforces the main message or theme.',
         maxChars: 150,
         examples: [
-          'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.',
+          'Great design is invisible. It works so well you never notice it.',
+          'The details are not the details. They make the design.',
         ],
-        tips: 'Use placeholder Latin or descriptive text about the typeface.',
+        tips: 'Extract a key insight or supporting statement from the post content. Avoid placeholder text.',
         required: false,
         type: 'string',
       },
@@ -716,63 +723,63 @@ export const templateSpecs: Record<string, TemplateSpec> = {
   },
 
   // ---------------------------------------------------------------------------
-  // Opera Poster
+  // Showcase Poster
   // ---------------------------------------------------------------------------
-  'opera-poster': {
-    id: 'opera-poster',
-    name: 'Opera Poster',
-    description: 'A classic Swiss-style venue poster with optional geometric accent squares. Ideal for formal events and venue-based announcements.',
+  'showcase-poster': {
+    id: 'showcase-poster',
+    name: 'Showcase Poster',
+    description: 'A bold poster with primary and secondary headings, optional info columns, and geometric accent squares. Left-aligned Swiss design style.',
     bestFor: [
-      'Conference announcements',
-      'Event promotions',
-      'Venue-based content',
-      'Formal announcements',
-      'Webinar promotions',
+      'Key announcements',
+      'Feature highlights',
+      'Multi-point summaries',
+      'Professional presentations',
+      'Topic overviews',
     ],
-    linkedInContext: 'Use for formal event announcements, conferences, or webinars. The structured layout conveys professionalism and attention to detail.',
+    linkedInContext: 'Use when highlighting multiple key points or features with a bold visual hierarchy. The info columns allow for organized supporting details.',
     fieldGuides: {
-      venueName: {
-        description: 'Organization or venue name displayed at top.',
+      primaryHeading: {
+        description: 'Main hero text displayed at top in large typography.',
         minChars: 5,
         maxChars: 40,
-        examples: ['DESIGN WEEK', 'TECHCONF 2024', 'PRODUCT SUMMIT'],
-        tips: 'This is displayed in hero typography at the top.',
+        examples: ['KEY INSIGHTS', 'THE BREAKDOWN', 'WHAT I LEARNED'],
+        tips: 'This is displayed in hero typography. Keep it punchy and bold.',
         required: true,
         type: 'string',
       },
-      eventTitle: {
-        description: 'Name of the specific event.',
+      secondaryHeading: {
+        description: 'Prominent subtitle that expands on the primary heading.',
         minChars: 10,
         maxChars: 50,
         examples: [
-          'The Future of AI in Design',
-          'Building Scalable Products',
-          'Leadership Workshop',
+          'Three principles for better design',
+          'What the data actually shows',
+          'The real takeaways',
         ],
         required: true,
         type: 'string',
       },
-      subtitle: {
-        description: 'Secondary event description.',
+      supportingText: {
+        description: 'Additional body text below the secondary heading.',
         maxChars: 60,
         examples: [
-          'A deep dive into machine learning for designers',
-          'Featuring industry leaders and innovators',
+          'A deep dive into what really matters',
+          'Insights from 10 years of experience',
         ],
         required: false,
         type: 'string',
       },
-      metadataColumns: {
-        description: 'Array of labeled lists for event details.',
+      infoColumns: {
+        description: 'Array of column objects with heading and items for organized details.',
         type: 'array',
         examples: [
-          '[{ "label": "Speakers", "items": ["Sarah Chen", "Mike Johnson"] }, { "label": "When", "items": ["March 15, 2024", "9:00 AM PST"] }]',
+          '[{ "heading": "Key Points", "items": ["Simplicity wins", "Speed matters"] }, { "heading": "Benefits", "items": ["10x faster", "Lower cost"] }]',
         ],
-        tips: 'Use 2-4 columns. Each column has a label and array of items.',
+        tips: 'Use 2-4 columns. Each column has a heading and array of items. Great for listing features, benefits, or key points.',
         required: false,
       },
       showAccentSquares: {
-        description: 'Display geometric squares flanking the title.',
+        description: 'Display geometric squares beside the secondary heading.',
         defaultValue: true,
         required: false,
         type: 'boolean',
@@ -787,12 +794,12 @@ export const templateSpecs: Record<string, TemplateSpec> = {
       footerText: {
         description: 'Small text at the bottom.',
         maxChars: 50,
-        examples: ['Register at event.com', 'Free for members'],
+        examples: ['Read more at blog.com', 'Full post in comments'],
         required: false,
         type: 'string',
       },
       theme: {
-        description: 'Color theme. vignelli-cream suits formal events.',
+        description: 'Color theme. vignelli-cream provides an elegant look.',
         examples: ['vignelli-cream', 'monochrome', 'swiss-red'],
         defaultValue: 'vignelli-cream',
         required: false,
@@ -800,68 +807,69 @@ export const templateSpecs: Record<string, TemplateSpec> = {
       },
     },
     exampleConfig: {
-      venueName: 'DESIGN SUMMIT',
-      eventTitle: 'The Future of Product Design',
-      subtitle: 'An exploration of emerging design trends',
-      metadataColumns: [
-        { label: 'Speakers', items: ['Sarah Chen', 'Mike Ross', 'Alex Kim'] },
-        { label: 'Date', items: ['March 15, 2024', '9:00 AM - 5:00 PM'] },
-        { label: 'Location', items: ['San Francisco', 'Moscone Center'] },
+      primaryHeading: 'KEY INSIGHTS',
+      secondaryHeading: 'What I learned building products',
+      supportingText: 'Three principles that changed everything',
+      infoColumns: [
+        { heading: 'Principles', items: ['Start simple', 'Ship fast', 'Listen always'] },
+        { heading: 'Results', items: ['10x faster launches', 'Higher retention'] },
+        { heading: 'Tools', items: ['Figma', 'Linear', 'Notion'] },
       ],
       showAccentSquares: true,
-      footerText: 'Register at designsummit.com',
+      footerText: 'Full breakdown in comments',
       theme: 'vignelli-cream',
     },
     designNotes: [
-      'The venue name is the largest element',
-      'Metadata columns organize event details cleanly',
+      'The primary heading is the largest element',
+      'Info columns organize supporting details cleanly',
       'Accent squares add visual interest without distraction',
+      'All text is left-aligned following Swiss design principles',
     ],
   },
 
   // ---------------------------------------------------------------------------
-  // Season Poster
+  // Content Grid Poster
   // ---------------------------------------------------------------------------
-  'season-poster': {
-    id: 'season-poster',
-    name: 'Season Poster',
-    description: 'A red background poster for multiple event listings. Perfect for program schedules, content series, or multi-part announcements.',
+  'content-grid-poster': {
+    id: 'content-grid-poster',
+    name: 'Content Grid Poster',
+    description: 'A bold poster with content blocks in a 2-column grid layout. Perfect for key points, tips, features, or multi-item summaries.',
     bestFor: [
-      'Content series announcements',
-      'Multi-event programs',
-      'Webinar series',
-      'Course modules',
-      'Quarterly updates',
+      'Key points summaries',
+      'Tips and best practices',
+      'Feature breakdowns',
+      'Step-by-step guides',
+      'Multi-item lists',
     ],
-    linkedInContext: 'Use when announcing multiple related events or a content series. The list format clearly communicates dates and details for each item.',
+    linkedInContext: 'Use when presenting multiple key points or items with supporting details. The 2-column layout keeps content organized and scannable.',
     fieldGuides: {
-      venueName: {
-        description: 'Organization or series name.',
+      brandName: {
+        description: 'Brand or series name displayed at the top.',
         maxChars: 35,
-        examples: ['DESIGN ACADEMY', 'PRODUCT TALKS', 'TECH SERIES'],
+        examples: ['KEY TAKEAWAYS', 'TOP TIPS', 'THE ESSENTIALS'],
         required: true,
         type: 'string',
       },
-      seasonTitle: {
-        description: 'Season or program title.',
+      sectionTitle: {
+        description: 'Section or topic title.',
         maxChars: 30,
-        examples: ['Q1 2024 Program', 'Spring Series', 'Learning Path'],
+        examples: ['What Really Matters', 'Best Practices', 'Core Principles'],
         required: true,
         type: 'string',
       },
-      events: {
-        description: 'Array of event objects with details.',
+      contentBlocks: {
+        description: 'Array of content block objects with title and optional details.',
         type: 'array',
         examples: [
-          '[{ "title": "Intro to Design Systems", "date": "JAN 15", "time": "2:00 PM PST", "status": "Registration Open" }]',
+          '[{ "title": "Start Simple", "shortLabel": "TIP 01", "description": "Complexity kills momentum" }]',
         ],
-        tips: 'Include 2-5 events. Each event can have title, date, time, status, description, and credits.',
+        tips: 'Include 2-5 blocks. Each can have: title (required), shortLabel (left column), subLabel, badge, description (right column), attribution.',
         required: true,
       },
       footerText: {
         description: 'Footer text for the poster.',
         maxChars: 50,
-        examples: ['Register at academy.com', 'All sessions recorded'],
+        examples: ['Full post in comments', 'More at blog.com'],
         required: false,
         type: 'string',
       },
@@ -874,44 +882,35 @@ export const templateSpecs: Record<string, TemplateSpec> = {
       },
     },
     exampleConfig: {
-      venueName: 'DESIGN ACADEMY',
-      seasonTitle: 'Q1 2024 Program',
-      events: [
+      brandName: 'KEY TAKEAWAYS',
+      sectionTitle: 'What I Learned',
+      contentBlocks: [
         {
-          title: 'Design Systems Fundamentals',
-          date: 'JAN 15',
-          time: '2:00 PM PST',
-          status: 'Registration Open',
-          description: 'Building scalable component libraries',
-          credits: [
-            { role: 'Speaker', name: 'Sarah Chen' },
-          ],
+          title: 'Start With Why',
+          shortLabel: 'TIP 01',
+          description: 'Always know the problem before building the solution',
+          attribution: 'From "Start with Why" by Simon Sinek',
         },
         {
-          title: 'Advanced Prototyping',
-          date: 'FEB 1',
-          time: '2:00 PM PST',
-          status: 'Coming Soon',
-          description: 'From concept to high-fidelity',
-          credits: [
-            { role: 'Speaker', name: 'Mike Ross' },
-          ],
+          title: 'Ship Early, Ship Often',
+          shortLabel: 'TIP 02',
+          description: 'Feedback loops beat perfection every time',
         },
         {
-          title: 'Design Leadership',
-          date: 'FEB 15',
-          time: '2:00 PM PST',
-          description: 'Managing design teams effectively',
+          title: 'Measure What Matters',
+          shortLabel: 'TIP 03',
+          badge: 'Essential',
+          description: 'Track the metrics that drive real outcomes',
         },
       ],
-      footerText: 'Register at designacademy.com',
+      footerText: 'Full breakdown in comments',
       theme: 'swiss-red-inverted',
     },
     designNotes: [
-      'The inverted theme (red background) makes this distinctive',
-      'Each event block includes date, time, and optional status',
-      'Credits array allows listing speakers, hosts, etc.',
-      'Event fields: title (40 chars), date (10 chars), time (15 chars), status (20 chars), description (50 chars)',
+      'The red inverted theme makes this distinctive and bold',
+      'Content blocks use 2-column grid: shortLabel/subLabel on left, description on right',
+      'shortLabel is great for numbering (TIP 01) or categories',
+      'Block fields: title (40 chars), shortLabel (10 chars), subLabel (15 chars), badge (20 chars), description (50 chars)',
     ],
   },
 };

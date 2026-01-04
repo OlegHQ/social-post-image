@@ -1,26 +1,27 @@
 import type { PosterDefinition, ThemePreset, PrimitiveNode } from '@/lib/types';
 
 /**
- * Opera/Venue Poster Preset
- * Creates a classic Swiss-style venue poster with geometric accent squares
+ * Showcase Poster Preset
+ * Creates a bold poster with primary/secondary headings and optional info columns
+ * Swiss-style left-aligned layout with geometric accent squares
  */
-export interface OperaPosterOptions {
-  venueName: string;
-  eventTitle: string;
-  subtitle?: string;
-  metadataColumns?: Array<{ label: string; items: string[] }>;
+export interface ShowcasePosterOptions {
+  primaryHeading: string;
+  secondaryHeading: string;
+  supportingText?: string;
+  infoColumns?: Array<{ heading: string; items: string[] }>;
   showAccentSquares?: boolean;
   squareSize?: number;
   footerText?: string;
   theme?: ThemePreset;
 }
 
-export function createOperaPoster(options: OperaPosterOptions): PosterDefinition {
+export function createShowcasePoster(options: ShowcasePosterOptions): PosterDefinition {
   const {
-    venueName,
-    eventTitle,
-    subtitle,
-    metadataColumns = [],
+    primaryHeading,
+    secondaryHeading,
+    supportingText,
+    infoColumns = [],
     showAccentSquares = true,
     squareSize = 100,
     footerText,
@@ -31,11 +32,10 @@ export function createOperaPoster(options: OperaPosterOptions): PosterDefinition
     const titleContent: PrimitiveNode = {
       type: 'stack',
       direction: 'vertical',
-      align: 'center',
       gap: 2,
       children: [
-        { type: 'text', content: eventTitle, variant: 'headline', color: 'foreground', align: 'center' },
-        ...(subtitle ? [{ type: 'text' as const, content: subtitle, variant: 'body' as const, color: 'muted' as const, align: 'center' as const }] : []),
+        { type: 'text', content: secondaryHeading, variant: 'headline', color: 'foreground' },
+        ...(supportingText ? [{ type: 'text' as const, content: supportingText, variant: 'body' as const, color: 'muted' as const }] : []),
       ],
     };
 
@@ -44,40 +44,38 @@ export function createOperaPoster(options: OperaPosterOptions): PosterDefinition
     return {
       type: 'stack',
       direction: 'horizontal',
-      justify: 'center',
       align: 'center',
       gap: 8,
       children: [
         { type: 'box', color: 'accent', width: `${squareSize}px`, height: `${squareSize}px` },
         titleContent,
-        { type: 'box', color: 'accent', width: `${squareSize}px`, height: `${squareSize}px` },
       ],
     };
   };
 
-  const buildMetadataGrid = (): PrimitiveNode | null => {
-    if (metadataColumns.length === 0) return null;
+  const buildInfoGrid = (): PrimitiveNode | null => {
+    if (infoColumns.length === 0) return null;
 
     return {
       type: 'grid',
-      columns: Math.min(metadataColumns.length, 4),
+      columns: Math.min(infoColumns.length, 4),
       gap: 6,
-      children: metadataColumns.slice(0, 4).map((col) => ({
+      children: infoColumns.slice(0, 4).map((col) => ({
         type: 'stack' as const,
         direction: 'vertical' as const,
         gap: 1 as const,
         children: [
-          { type: 'text' as const, content: col.label, variant: 'body' as const, color: 'foreground' as const, style: { fontWeight: '700' } },
+          { type: 'text' as const, content: col.heading, variant: 'body' as const, color: 'foreground' as const, style: { fontWeight: '700' } },
           ...col.items.map((item) => ({ type: 'text' as const, content: item, variant: 'meta' as const, color: 'foreground' as const })),
         ],
       })),
     };
   };
 
-  const metadataGrid = buildMetadataGrid();
+  const infoGrid = buildInfoGrid();
 
   return {
-    name: `Opera - ${venueName} - ${eventTitle}`,
+    name: `Showcase - ${primaryHeading.slice(0, 30)}`,
     canvas: { preset: 'linkedin-portrait' },
     theme: { preset: theme },
     root: {
@@ -86,9 +84,9 @@ export function createOperaPoster(options: OperaPosterOptions): PosterDefinition
       gap: 0,
       style: { flex: '1' },
       children: [
-        { type: 'text', content: venueName, variant: 'hero', color: 'foreground', style: { letterSpacing: '-0.04em', lineHeight: '0.9' } },
+        { type: 'text', content: primaryHeading, variant: 'hero', color: 'foreground', style: { letterSpacing: '-0.04em', lineHeight: '0.9' } },
         { type: 'spacer', size: 8 },
-        ...(metadataGrid ? [metadataGrid] : []),
+        ...(infoGrid ? [infoGrid] : []),
         { type: 'spacer', size: 'flex' },
         buildTitleSection(),
         { type: 'spacer', size: 'flex' },

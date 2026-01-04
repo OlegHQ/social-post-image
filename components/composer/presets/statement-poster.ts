@@ -11,6 +11,7 @@ export interface StatementPosterOptions {
   author?: string;
   topic?: string;
   accentBox?: { label?: string; value: string };
+  showAccentBox?: boolean;
   headlineVariant?: TextVariant;
   headlineUppercase?: boolean;
   theme?: ThemePreset;
@@ -24,10 +25,14 @@ export function createStatementPoster(options: StatementPosterOptions): PosterDe
     author,
     topic,
     accentBox,
+    showAccentBox = true,
     headlineVariant = 'hero',
     headlineUppercase = true,
     theme = 'swiss-red',
   } = options;
+
+  // Only show accent box if showAccentBox is true AND accentBox data is provided
+  const shouldShowAccentBox = showAccentBox && accentBox;
 
   return {
     name: `Statement - ${headline.slice(0, 30)}...`,
@@ -60,19 +65,17 @@ export function createStatementPoster(options: StatementPosterOptions): PosterDe
           ],
         },
         { type: 'spacer', size: 'flex' },
-        ...(accentBox
+        ...(shouldShowAccentBox && accentBox
           ? [{
               type: 'box' as const,
               color: 'accent' as const,
               padding: 6 as const,
-              border: true,
-              borderColor: 'foreground' as const,
               style: { alignSelf: 'flex-end', minWidth: '200px' },
               children: [{
                 type: 'stack' as const,
                 direction: 'vertical' as const,
                 gap: 2 as const,
-                align: 'center' as const,
+                align: 'end' as const,
                 children: [
                   ...(accentBox.label ? [{ type: 'text' as const, content: accentBox.label, variant: 'label' as const, color: 'background' as const }] : []),
                   { type: 'text' as const, content: accentBox.value, variant: 'headline' as const, color: 'background' as const },

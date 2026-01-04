@@ -203,26 +203,29 @@ createAnnouncementPoster({
 })
 ```
 
-### `createOperaPoster(options)`
-Classic Swiss venue poster
+### `createShowcasePoster(options)`
+Bold poster with primary/secondary headings and info columns
 ```typescript
-createOperaPoster({
-  venueName: 'Opernhaus Zurich',
-  eventTitle: 'Die Zauberflote',
-  subtitle: 'Oper von Mozart',
+createShowcasePoster({
+  primaryHeading: 'DESIGN SYSTEMS',
+  secondaryHeading: 'Building for Scale',
+  supportingText: 'A systematic approach',
+  infoColumns: [{ heading: 'Benefits', items: ['Consistency', 'Speed'] }],
   showAccentSquares: true,
-  theme: 'monochrome'
+  theme: 'vignelli-cream'
 })
 ```
 
-### `createSeasonPoster(options)`
-Multi-event season program
+### `createContentGridPoster(options)`
+Content blocks in 2-column grid layout
 ```typescript
-createSeasonPoster({
-  venueName: 'Opernhaus Zurich',
-  seasonTitle: 'Spielzeit 2024/25',
-  events: [{ title: 'Event', date: 'Date', time: 'Time' }],
-  theme: 'swiss-red'
+createContentGridPoster({
+  brandName: 'DESIGN TIPS',
+  sectionTitle: 'Best Practices',
+  contentBlocks: [
+    { title: 'Typography First', shortLabel: 'TIP 01', description: 'Choose typeface first' }
+  ],
+  theme: 'swiss-red-inverted'
 })
 ```
 
