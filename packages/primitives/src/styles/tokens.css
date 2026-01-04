@@ -1,0 +1,135 @@
+/**
+ * Swiss Design System - CSS Custom Properties
+ * These are set dynamically by the theme system
+ */
+
+:root {
+  /* Typography */
+  --font-family-primary: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  /* Font Sizes */
+  --text-xs: 12px;
+  --text-sm: 16px;
+  --text-base: 21px;
+  --text-lg: 28px;
+  --text-xl: 38px;
+  --text-2xl: 50px;
+  --text-3xl: 67px;
+  --text-4xl: 90px;
+  --text-5xl: 120px;
+  --text-6xl: 160px;
+  --text-7xl: 200px;
+
+  /* Font Weights */
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  /* Line Heights */
+  --leading-none: 0.85;
+  --leading-tight: 0.9;
+  --leading-snug: 1.1;
+  --leading-normal: 1.4;
+  --leading-relaxed: 1.6;
+
+  /* Letter Spacing */
+  --tracking-tighter: -0.04em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
+  --tracking-wider: 0.1em;
+
+  /* Spacing (4px base) */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Border Widths */
+  --border-thin: 1px;
+  --border-medium: 2px;
+  --border-thick: 4px;
+
+  /* Default Theme Colors (swiss-red) */
+  --color-background: #F5F5F5;
+  --color-foreground: #000000;
+  --color-accent: #FF0000;
+  --color-accent-alt: #FF0000;
+  --color-muted: #666666;
+}
+
+/* Theme: Swiss Red */
+[data-theme="swiss-red"] {
+  --color-background: #F5F5F5;
+  --color-foreground: #000000;
+  --color-accent: #FF0000;
+  --color-accent-alt: #FF0000;
+  --color-muted: #666666;
+}
+
+/* Theme: Klein Blue */
+[data-theme="klein-blue"] {
+  --color-background: #FFFFFF;
+  --color-foreground: #000000;
+  --color-accent: #002FA7;
+  --color-accent-alt: #002FA7;
+  --color-muted: #555555;
+}
+
+/* Theme: Monochrome */
+[data-theme="monochrome"] {
+  --color-background: #FFFFFF;
+  --color-foreground: #000000;
+  --color-accent: #000000;
+  --color-accent-alt: #000000;
+  --color-muted: #888888;
+}
+
+/* Theme: Vignelli Gold */
+[data-theme="vignelli-gold"] {
+  --color-background: #1A1A1A;
+  --color-foreground: #FFFFFF;
+  --color-accent: #C9A962;
+  --color-accent-alt: #E8DCC4;
+  --color-muted: #888888;
+}
+
+/* Theme: Vignelli Cream */
+[data-theme="vignelli-cream"] {
+  --color-background: #E8E4DD;
+  --color-foreground: #000000;
+  --color-accent: #C41E3A;
+  --color-accent-alt: #C41E3A;
+  --color-muted: #666666;
+}
+
+/* Theme: Neue Teal */
+[data-theme="neue-teal"] {
+  --color-background: #1B4D4D;
+  --color-foreground: #F5F0E6;
+  --color-accent: #E85D4C;
+  --color-accent-alt: #F5F0E6;
+  --color-muted: #7A9E9E;
+}
+
+/* Theme: Orange Energy */
+[data-theme="orange-energy"] {
+  --color-background: #F5EFE6;
+  --color-foreground: #000000;
+  --color-accent: #FF6600;
+  --color-accent-alt: #FF6600;
+  --color-muted: #666666;
+}
