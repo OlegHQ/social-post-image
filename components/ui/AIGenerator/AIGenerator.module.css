@@ -1,0 +1,344 @@
+.generator {
+  margin-bottom: 24px;
+  background: #222;
+  border: 1px solid #333;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #331111, #222);
+  border: none;
+  border-bottom: 1px solid #333;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.header:hover {
+  background: linear-gradient(135deg, #441111, #2a2a2a);
+}
+
+.headerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  background: #ff0000;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.headerText {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.expandIcon {
+  color: #666;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.content {
+  padding: 16px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 0;
+  color: #fff;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #ff0000;
+}
+
+.textarea::placeholder {
+  color: #666;
+}
+
+.textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.charCount {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #666;
+  text-align: right;
+}
+
+.charWarning {
+  color: #ff6666;
+}
+
+/* Template Selector */
+.templateSelector {
+  margin-top: 12px;
+}
+
+.templateLabel {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.templateGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.templateChip {
+  padding: 6px 10px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #888;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.templateChip:hover:not(:disabled) {
+  border-color: #666;
+  color: #fff;
+}
+
+.templateChip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.templateChipSelected {
+  background: #331111;
+  border-color: #ff0000;
+  color: #ff0000;
+}
+
+.templateChipSelected:hover:not(:disabled) {
+  background: #441111;
+  border-color: #ff3333;
+  color: #ff3333;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.generateButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #ff0000;
+  border: none;
+  border-radius: 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.generateButton:hover:not(:disabled) {
+  background: #cc0000;
+}
+
+.generateButton:disabled {
+  background: #444;
+  cursor: not-allowed;
+}
+
+.clearButton {
+  padding: 12px 16px;
+  background: transparent;
+  border: 1px solid #444;
+  border-radius: 0;
+  color: #888;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.clearButton:hover:not(:disabled) {
+  border-color: #666;
+  color: #fff;
+}
+
+.clearButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  color: #ff6666;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.success {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(0, 255, 0, 0.05);
+  border: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.successHeader {
+  color: #4ade80;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.reasoning {
+  color: #888;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* Variants Section */
+.variantsSection {
+  margin-top: 16px;
+}
+
+.variantsLabel {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.variantsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.variantCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.variantCard:hover {
+  border-color: #666;
+  background: #333;
+}
+
+.variantCard.selected {
+  border-color: #ff0000;
+  background: #331111;
+}
+
+.variantNumber {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #444;
+  color: #888;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.variantCard.selected .variantNumber {
+  background: #ff0000;
+  color: #fff;
+}
+
+.variantContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.variantLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ff0000;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.variantPreview {
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.variantTheme {
+  flex-shrink: 0;
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}

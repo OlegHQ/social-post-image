@@ -1,38 +1,31 @@
 {
   "name": "swiss-content-generator",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @swiss/ui dev",
-    "build": "pnpm -r build",
-    "swiss": "node --import=tsx packages/cli/bin/swiss.js",
-    "generate": "pnpm swiss generate",
-    "preview": "pnpm swiss preview",
-    "lint": "eslint . --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf node_modules packages/*/node_modules apps/*/node_modules",
-    "verify": "pnpm --filter @swiss/verifier verify",
-    "verify:update": "pnpm --filter @swiss/verifier verify:update",
-    "verify:layout": "pnpm --filter @swiss/verifier verify:layout",
-    "verify:rules": "pnpm --filter @swiss/verifier verify:rules"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next-auth": "5.0.0-beta.25",
+    "html-to-image": "^1.11.11",
+    "zod": "^3.22.0",
+    "clsx": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "@typescript-eslint/parser": "^6.15.0",
+    "typescript": "^5.3.3",
     "eslint": "^8.56.0",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^3.1.1",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "eslint-config-next": "^14.2.0"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
-  },
-  "packageManager": "pnpm@8.12.1"
+    "node": ">=18.0.0"
+  }
 }

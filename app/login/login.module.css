@@ -1,0 +1,107 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  padding: 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 360px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  padding: 40px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo {
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #ff0000;
+  margin: 0 0 8px 0;
+}
+
+.tagline {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 0;
+  color: #fff;
+  transition: border-color 0.15s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #ff0000;
+}
+
+.input::placeholder {
+  color: #666;
+}
+
+.error {
+  color: #ff0000;
+  font-size: 13px;
+  margin: 0;
+}
+
+.button {
+  width: 100%;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  background: #ff0000;
+  border: none;
+  border-radius: 0;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.button:hover:not(:disabled) {
+  background: #cc0000;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

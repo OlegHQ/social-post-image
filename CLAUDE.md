@@ -8,15 +8,39 @@ Generate Swiss-style LinkedIn post illustrations using a declarative visual lang
 
 ```
 social-post-image/
-├── packages/
-│   ├── primitives/      # @swiss/primitives - Design tokens & atomic components
-│   ├── composer/        # @swiss/composer - Layout composition & presets
-│   ├── renderer/        # @swiss/renderer - Puppeteer PNG generation
-│   └── cli/             # @swiss/cli - Command-line interface
-├── apps/
-│   └── ui/              # React SPA for interactive design
-├── output/              # Generated images
-└── references/          # Visual reference images
+├── app/
+│   ├── layout.tsx            # Root layout + fonts
+│   ├── globals.css           # Global styles
+│   ├── providers.tsx         # SessionProvider + DesignProvider
+│   ├── page.tsx              # Main app (protected)
+│   ├── login/
+│   │   └── page.tsx          # Login form
+│   └── api/auth/[...nextauth]/
+│       └── route.ts          # NextAuth handler
+├── components/
+│   ├── primitives/           # Text, Box, Stack, Grid, etc.
+│   ├── composer/
+│   │   ├── Canvas.tsx
+│   │   ├── LayoutRenderer.tsx
+│   │   └── presets/          # 8 preset functions
+│   └── ui/
+│       ├── Sidebar/
+│       ├── Editor/
+│       └── LivePreview/
+├── lib/
+│   ├── auth.ts               # NextAuth config
+│   ├── tokens/               # colors, typography, spacing
+│   ├── themes/               # 13 theme definitions
+│   └── types.ts              # PosterDefinition, etc.
+├── context/
+│   └── DesignContext.tsx     # State management
+├── hooks/
+│   └── useExport.ts          # html-to-image export
+├── schemas/
+│   └── presetSchemas.ts      # Form field definitions
+├── middleware.ts             # Route protection
+├── output/                   # Generated images
+└── references/               # Visual reference images
 ```
 
 ## Key Concepts
@@ -56,8 +80,6 @@ const poster: PosterDefinition = {
 | `spacer` | Empty space | `size` (token or 'flex') |
 | `seriesNumber` | Large number | `number`, `size`, `color` |
 | `seriesDots` | Dot indicators | `filled`, `total`, `color` |
-| `header` | Compound header | `title`, `subtitle`, `columns` |
-| `footer` | Compound footer | `author`, `seriesNumber`, `showDots` |
 
 ### Text Variants
 
@@ -84,6 +106,12 @@ const poster: PosterDefinition = {
 | `vignelli-cream` | Vignelli light | Cream | Crimson |
 | `neue-teal` | Typography style | Teal | Coral |
 | `orange-energy` | Vibrant | Warm white | Orange |
+| `midnight-gold` | Dark luxury | Dark | Gold |
+| `forest-contrast` | Nature theme | Forest green | Coral |
+| `brutalist-concrete` | Brutalist | Concrete gray | Orange |
+| `tech-terminal` | Tech/hacker | Dark | Green |
+| `paper-ink` | Editorial | Paper | Ink |
+| `swiss-red-inverted` | Inverted Swiss | Red | White |
 
 ### Canvas Presets
 
@@ -111,7 +139,19 @@ Colors can be specified as:
 6. **Typography hierarchy**: Strong size contrast between levels
 7. **Grid-based**: Elements align to 12-column grid
 
-## Preset Functions
+## Available Presets
+
+### `createStatementPoster(options)`
+Simple headline poster
+```typescript
+createStatementPoster({
+  headline: 'Main headline',
+  subheadline: 'Supporting text',
+  author: 'Author',
+  topic: 'Topic',
+  theme: 'swiss-red'
+})
+```
 
 ### `createVignelliQuote(options)`
 Quote poster with emphasis phrase (Massimo Vignelli style)
@@ -138,28 +178,63 @@ createTypographyShowcase({
 })
 ```
 
-### `createStatementPoster(options)`
-Simple headline poster
+### `createHotTakePoster(options)`
+Contrarian statement poster
 ```typescript
-createStatementPoster({
-  headline: 'Main headline',
-  subheadline: 'Supporting text',
-  author: 'Author',
-  topic: 'Topic',
+createHotTakePoster({
+  prefix: 'UNPOPULAR OPINION:',
+  statement: 'Your hot take here',
+  author: 'nexo.sh',
+  hashtag: '#Tech',
   theme: 'swiss-red'
 })
 ```
 
-### `createEventPoster(options)`
-Event information with slash separators
+### `createAnnouncementPoster(options)`
+Article or launch announcement
 ```typescript
-createEventPoster({
-  title: 'Event Name',
-  date: 'FEB 21ST',
-  venue: 'Venue Name',
-  timeSlots: [{ label: 'Doors', time: '6PM' }],
-  priceTiers: [{ label: 'Members', price: 'FREE' }],
+createAnnouncementPoster({
+  label: 'NEW POST',
+  title: 'Article title',
+  teaser: 'Hook line',
+  url: 'nexo.sh/article',
+  author: 'nexo.sh',
+  theme: 'klein-blue'
+})
+```
+
+### `createOperaPoster(options)`
+Classic Swiss venue poster
+```typescript
+createOperaPoster({
+  venueName: 'Opernhaus Zurich',
+  eventTitle: 'Die Zauberflote',
+  subtitle: 'Oper von Mozart',
+  showAccentSquares: true,
   theme: 'monochrome'
+})
+```
+
+### `createSeasonPoster(options)`
+Multi-event season program
+```typescript
+createSeasonPoster({
+  venueName: 'Opernhaus Zurich',
+  seasonTitle: 'Spielzeit 2024/25',
+  events: [{ title: 'Event', date: 'Date', time: 'Time' }],
+  theme: 'swiss-red'
+})
+```
+
+### `createFeatureShowcase(options)`
+Giant keyword poster
+```typescript
+createFeatureShowcase({
+  keyword: 'GRIDS',
+  subtitle: 'Unlock the Power of Grids',
+  lowercase: false,
+  showBottomBar: true,
+  theme: 'orange-energy'
 })
 ```
 
@@ -167,64 +242,41 @@ createEventPoster({
 
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
-# Start UI development server
-pnpm dev
+# Start development server
+npm run dev
 
-# Generate image from CLI
-pnpm generate --preset vignelli-quote --quote "Your quote" --emphasis "Key phrase" --author "Name" -o poster.png
+# Build for production
+npm run build
 
-# List available presets and themes
-pnpm --filter @swiss/cli list
-
-# Build all packages
-pnpm build
+# Start production server
+npm start
 ```
 
-## Creating Custom Definitions
+## Environment Variables
 
-For complex layouts, create a JSON file:
-
-```json
-{
-  "canvas": { "preset": "linkedin-portrait" },
-  "theme": { "preset": "swiss-red", "overrides": { "accent": "#FF5500" } },
-  "root": {
-    "type": "stack",
-    "direction": "vertical",
-    "gap": 8,
-    "children": [
-      {
-        "type": "text",
-        "content": "CUSTOM HEADLINE",
-        "variant": "hero",
-        "color": "accent"
-      },
-      { "type": "spacer", "size": "flex" },
-      { "type": "divider" },
-      {
-        "type": "footer",
-        "author": "Designer Name",
-        "seriesNumber": 1
-      }
-    ]
-  }
-}
+Create `.env.local` with:
+```
+AUTH_PASSWORD=your-secret-password
+AUTH_SECRET=run-openssl-rand-base64-32
 ```
 
-Then generate:
-```bash
-pnpm generate -i poster.json -o output.png
-```
+## Authentication
+
+The app is protected by password authentication:
+- Set `AUTH_PASSWORD` in environment variables
+- Users enter password at `/login`
+- Session persists for 30 days via JWT cookie
+- Protected by Next.js middleware
 
 ## Important Files
 
-- `packages/composer/src/types.ts` - Full declarative language schema
-- `packages/primitives/src/themes/` - Theme definitions
-- `packages/primitives/src/tokens/` - Design tokens
-- `packages/composer/src/presets/` - Preset template functions
-- `apps/ui/src/context/DesignContext.tsx` - UI state management
+- `lib/types.ts` - Full declarative language schema
+- `lib/themes/` - Theme definitions
+- `lib/tokens/` - Design tokens
+- `components/composer/presets/` - Preset template functions
+- `context/DesignContext.tsx` - UI state management
 
 ## Tips for AI Usage
 

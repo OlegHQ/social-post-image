@@ -2,6 +2,10 @@
 node_modules
 .pnpm-store
 
+# Next.js
+.next
+out
+
 # Build outputs
 dist
 build
@@ -34,6 +38,9 @@ pnpm-debug.log*
 
 # Test coverage
 coverage
+
+# Vercel
+.vercel
 
 # Misc
 *.tgz
