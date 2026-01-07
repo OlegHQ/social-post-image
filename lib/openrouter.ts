@@ -1,11 +1,11 @@
 /**
- * OpenRouter API Client
+ * Groq API Client
  *
- * Handles communication with OpenRouter API for LLM-powered illustration generation.
+ * Handles communication with Groq API for LLM-powered illustration generation.
  */
 
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MODEL = 'openai/gpt-oss-120b:free';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const MODEL = 'openai/gpt-oss-120b';
 
 interface ChatMessage {
 	role: 'system' | 'user' | 'assistant';
@@ -34,7 +34,7 @@ export interface GenerateResult {
 }
 
 /**
- * Call OpenRouter API with system and user prompts
+ * Call Groq API with system and user prompts
  */
 export async function callOpenRouter(
 	systemPrompt: string,
@@ -50,13 +50,11 @@ export async function callOpenRouter(
 		{ role: 'user', content: userPrompt },
 	];
 
-	const response = await fetch(OPENROUTER_API_URL, {
+	const response = await fetch(GROQ_API_URL, {
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${apiKey}`,
 			'Content-Type': 'application/json',
-			'HTTP-Referer': process.env.NEXTAUTH_URL || 'http://localhost:3000',
-			'X-Title': 'Swiss Content Generator',
 		},
 		body: JSON.stringify({
 			model: MODEL,
@@ -69,25 +67,25 @@ export async function callOpenRouter(
 	if (!response.ok) {
 		const errorData = await response.json().catch(() => ({}));
 		throw new Error(
-			`OpenRouter API error: ${errorData.error?.message || response.statusText}`
+			`Groq API error: ${errorData.error?.message || response.statusText}`
 		);
 	}
 
 	const data: OpenRouterResponse = await response.json();
 
 	if (data.error) {
-		throw new Error(`OpenRouter API error: ${data.error.message}`);
+		throw new Error(`Groq API error: ${data.error.message}`);
 	}
 
 	if (!data.choices?.[0]?.message?.content) {
-		throw new Error('No response content from OpenRouter API');
+		throw new Error('No response content from Groq API');
 	}
 
 	return data.choices[0].message.content;
 }
 
 /**
- * Stream response from OpenRouter API
+ * Stream response from Groq API
  * Yields chunks of text as they arrive
  */
 export async function* streamOpenRouter(
@@ -104,13 +102,11 @@ export async function* streamOpenRouter(
 		{ role: 'user', content: userPrompt },
 	];
 
-	const response = await fetch(OPENROUTER_API_URL, {
+	const response = await fetch(GROQ_API_URL, {
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${apiKey}`,
 			'Content-Type': 'application/json',
-			'HTTP-Referer': process.env.NEXTAUTH_URL || 'http://localhost:3000',
-			'X-Title': 'Swiss Content Generator',
 		},
 		body: JSON.stringify({
 			model: MODEL,
@@ -124,7 +120,7 @@ export async function* streamOpenRouter(
 	if (!response.ok) {
 		const errorData = await response.json().catch(() => ({}));
 		throw new Error(
-			`OpenRouter API error: ${errorData.error?.message || response.statusText}`
+			`Groq API error: ${errorData.error?.message || response.statusText}`
 		);
 	}
 
