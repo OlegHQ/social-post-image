@@ -11,6 +11,16 @@ import {
   createShowcasePoster,
   createContentGridPoster,
   createFeatureShowcase,
+  // New presets from refs3 designs
+  createMinimalQuote,
+  createParagraphQuote,
+  createSplitWord,
+  createVignelliEnhanced,
+  createTypeSpecimen,
+  createManifestoQuotes,
+  createNumberedPrinciples,
+  createTwoToneQuote,
+  createSplitStatement,
 } from '@/components/composer';
 import { presetSchemas } from '@/schemas/presetSchemas';
 
@@ -26,6 +36,16 @@ const presetFunctions: Record<string, (options: Record<string, unknown>) => Post
   'showcase-poster': (options) => createShowcasePoster(options as unknown as Parameters<typeof createShowcasePoster>[0]),
   'content-grid-poster': (options) => createContentGridPoster(options as unknown as Parameters<typeof createContentGridPoster>[0]),
   'feature-showcase': (options) => createFeatureShowcase(options as unknown as Parameters<typeof createFeatureShowcase>[0]),
+  // New presets from refs3 designs
+  'minimal-quote': (options) => createMinimalQuote(options as unknown as Parameters<typeof createMinimalQuote>[0]),
+  'paragraph-quote': (options) => createParagraphQuote(options as unknown as Parameters<typeof createParagraphQuote>[0]),
+  'split-word': (options) => createSplitWord(options as unknown as Parameters<typeof createSplitWord>[0]),
+  'vignelli-enhanced': (options) => createVignelliEnhanced(options as unknown as Parameters<typeof createVignelliEnhanced>[0]),
+  'type-specimen': (options) => createTypeSpecimen(options as unknown as Parameters<typeof createTypeSpecimen>[0]),
+  'manifesto-quotes': (options) => createManifestoQuotes(options as unknown as Parameters<typeof createManifestoQuotes>[0]),
+  'numbered-principles': (options) => createNumberedPrinciples(options as unknown as Parameters<typeof createNumberedPrinciples>[0]),
+  'two-tone-quote': (options) => createTwoToneQuote(options as unknown as Parameters<typeof createTwoToneQuote>[0]),
+  'split-statement': (options) => createSplitStatement(options as unknown as Parameters<typeof createSplitStatement>[0]),
 };
 
 function getPresetFunction(presetId: string) {

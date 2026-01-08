@@ -266,6 +266,292 @@ export const presetSchemas: Record<string, PresetSchema> = {
       bottomRight: { icon: 'circle', title: 'HARMONY', body: 'Visual balance through systematic spacing' },
     },
   },
+
+  // ============================================
+  // New presets from refs3 designs
+  // ============================================
+
+  'minimal-quote': {
+    id: 'minimal-quote',
+    name: 'Minimal Quote',
+    description: 'Simple quote with explanation (Dieter Rams style)',
+    fields: [
+      { key: 'quote', label: 'Quote', type: 'textarea', required: true, placeholder: 'Enter the quote text...', helpText: 'Main quote text' },
+      { key: 'explanation', label: 'Explanation', type: 'textarea', placeholder: 'Explanation of the quote', helpText: 'Additional context' },
+      { key: 'tagline', label: 'Tagline', type: 'text', placeholder: 'e.g., Back to purity, Back to simplicity.' },
+      { key: 'author', label: 'Author', type: 'text', required: true, placeholder: 'Author name' },
+      { key: 'authorPrefix', label: 'Author Prefix', type: 'text', defaultValue: '~', placeholder: 'e.g., ~ or —' },
+      { key: 'brand', label: 'Brand', type: 'text', placeholder: 'Footer brand name' },
+      { key: 'showIcon', label: 'Show Icon', type: 'toggle', defaultValue: true, helpText: 'Display decorative icon' },
+    ],
+    defaultOptions: {
+      quote: 'Good design is as little design as possible.',
+      explanation: 'Less, but better – because it concentrates on the essential aspects, and the products are not burdened with non-essentials.',
+      tagline: 'Back to purity, Back to simplicity.',
+      author: 'Dieter Rams',
+      authorPrefix: '~',
+      brand: 'STARTUPVITAMINS',
+      showIcon: true,
+    },
+  },
+
+  'paragraph-quote': {
+    id: 'paragraph-quote',
+    name: 'Paragraph Quote',
+    description: 'Multi-paragraph quote (Müller-Brockmann style)',
+    fields: [
+      { key: 'paragraphs', label: 'Paragraphs', type: 'stringArray', required: true, placeholder: 'Add quote paragraphs', helpText: 'Each paragraph as separate entry' },
+      { key: 'paragraphGap', label: 'Paragraph Gap', type: 'select', defaultValue: 'medium', options: [
+        { value: 'small', label: 'Small' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'large', label: 'Large' },
+      ]},
+      { key: 'author', label: 'Author', type: 'text', required: true, placeholder: 'Author name' },
+      { key: 'authorPrefix', label: 'Author Prefix', type: 'text', defaultValue: '—', placeholder: 'e.g., — or -' },
+      { key: 'cornerText', label: 'Corner Text', type: 'text', placeholder: 'Small corner attribution' },
+      { key: 'showGridLines', label: 'Show Grid Lines', type: 'toggle', defaultValue: false, helpText: 'Decorative grid overlay' },
+    ],
+    defaultOptions: {
+      paragraphs: [
+        'The grid system is an aid, not a guarantee.',
+        'It permits a number of possible uses and each designer can look for a solution appropriate to his personal style.',
+        'But one must learn how to use the grid; it is an art that requires practice.',
+      ],
+      paragraphGap: 'medium',
+      author: 'Josef Müller-Brockmann',
+      authorPrefix: '—',
+      cornerText: '',
+      showGridLines: false,
+    },
+  },
+
+  'split-word': {
+    id: 'split-word',
+    name: 'Split Word',
+    description: 'Giant word split across lines (Vignelli tribute)',
+    fields: [
+      { key: 'url', label: 'URL', type: 'text', placeholder: 'Top URL text' },
+      { key: 'wordPart1', label: 'Word Part 1', type: 'text', required: true, placeholder: 'e.g., For' },
+      { key: 'wordPart2', label: 'Word Part 2', type: 'text', required: true, placeholder: 'e.g., ever.' },
+      { key: 'wordColor', label: 'Word Color', type: 'select', defaultValue: 'accent', options: [
+        { value: 'foreground', label: 'Foreground' },
+        { value: 'accent', label: 'Accent' },
+      ]},
+      { key: 'supportingQuote', label: 'Supporting Quote', type: 'textarea', placeholder: 'Quote below the word' },
+      { key: 'bioColumns', label: 'Bio Columns', type: 'array', helpText: 'Footer bio columns (max 3)', itemSchema: [
+        { key: 'primary', label: 'Primary', type: 'text', required: true },
+        { key: 'secondary', label: 'Secondary', type: 'text' },
+        { key: 'tertiary', label: 'Tertiary', type: 'text' },
+      ]},
+    ],
+    defaultOptions: {
+      url: 'thefutur.com',
+      wordPart1: 'For',
+      wordPart2: 'ever.',
+      wordColor: 'accent',
+      supportingQuote: 'If you do it right, it will last forever.',
+      bioColumns: [
+        { primary: 'Massimo Vignelli', secondary: '1931-2014' },
+        { primary: 'Graphic Designer', secondary: 'Industrial Designer', tertiary: 'Architect' },
+        { primary: 'Vignelli Associates', secondary: 'Unimark International' },
+      ],
+    },
+  },
+
+  'vignelli-enhanced': {
+    id: 'vignelli-enhanced',
+    name: 'Vignelli Enhanced',
+    description: 'Advanced Vignelli-style quote with header columns and footer',
+    fields: [
+      { key: 'seriesTitle', label: 'Series Title', type: 'text', defaultValue: 'Five phrases to live by:' },
+      { key: 'authorName', label: 'Author Name', type: 'text', defaultValue: 'Massimo Vignelli' },
+      { key: 'headerColumns', label: 'Header Columns', type: 'stringArray', helpText: 'Up to 4 meta columns' },
+      { key: 'quote', label: 'Quote', type: 'textarea', required: true, placeholder: 'Full quote text' },
+      { key: 'emphasisPhrase', label: 'Emphasis Phrase', type: 'text', required: true, placeholder: 'Key phrase to emphasize' },
+      { key: 'quoteItalic', label: 'Italic Quote', type: 'toggle', defaultValue: true },
+      { key: 'quoteVariant', label: 'Quote Size', type: 'select', defaultValue: 'subhead', options: [
+        { value: 'subhead', label: 'Subhead' },
+        { value: 'title', label: 'Title' },
+      ]},
+      { key: 'emphasisVariant', label: 'Emphasis Size', type: 'select', defaultValue: 'display', options: [
+        { value: 'display', label: 'Display' },
+        { value: 'hero', label: 'Hero' },
+      ]},
+      { key: 'bioColumns', label: 'Bio Columns', type: 'array', helpText: 'Footer bio columns', itemSchema: [
+        { key: 'title', label: 'Title', type: 'text' },
+        { key: 'text', label: 'Text', type: 'text', required: true },
+      ]},
+      { key: 'seriesNumber', label: 'Series Number', type: 'number', defaultValue: 2 },
+    ],
+    defaultOptions: {
+      seriesTitle: 'Five phrases to live by:',
+      authorName: 'Massimo Vignelli',
+      headerColumns: [
+        'Vignelli-isms Poster series. In recognition of his outstanding contribution to the world of graphic design.',
+        'On the evening of Tuesday, March 8, The Architectural League gave its President\'s Medal to Lella and Massimo Vignelli.',
+        'In 1971, Massimo founded Vignelli Associates with his wife, Lella.',
+        'Vignelli was involved with filmmaker Gary Hustwit in the documentary Helvetica.',
+      ],
+      quote: 'We like design to be visually powerful, intellectually elegant, and above all timeless.',
+      emphasisPhrase: 'visually powerful, intellectually elegant.',
+      quoteItalic: true,
+      quoteVariant: 'subhead',
+      emphasisVariant: 'display',
+      bioColumns: [
+        { title: 'Massimo Vignelli', text: 'Born 1931 in Milan, Italy. Vignelli Associates, co founded with wife Lella.' },
+        { text: 'Vignelli works firmly within the Modernist tradition, and focuses on simplicity through the use of basic geometric forms in all of his work.' },
+      ],
+      seriesNumber: 2,
+    },
+  },
+
+  'type-specimen': {
+    id: 'type-specimen',
+    name: 'Type Specimen',
+    description: 'Font showcase with stacked typography',
+    fields: [
+      { key: 'fontFamily', label: 'Font Family', type: 'text', required: true, placeholder: 'e.g., Last' },
+      { key: 'fontWeights', label: 'Font Weights', type: 'text', defaultValue: '10 weights + Italics' },
+      { key: 'charset', label: 'Character Set', type: 'text', defaultValue: 'Latin Extended-A' },
+      { key: 'releaseDate', label: 'Release Date', type: 'text', placeholder: 'e.g., Sept. 2025' },
+      { key: 'stackedLines', label: 'Stacked Lines', type: 'stringArray', required: true, helpText: 'Typography showcase lines' },
+      { key: 'lineSpacing', label: 'Line Spacing', type: 'select', defaultValue: 'tight', options: [
+        { value: 'tight', label: 'Tight' },
+        { value: 'normal', label: 'Normal' },
+        { value: 'loose', label: 'Loose' },
+      ]},
+      { key: 'uppercase', label: 'Uppercase', type: 'toggle', defaultValue: true },
+      { key: 'footerColumns', label: 'Footer Columns', type: 'array', itemSchema: [
+        { key: 'label', label: 'Label', type: 'text' },
+        { key: 'value', label: 'Value', type: 'text' },
+      ]},
+      { key: 'centerLogo', label: 'Center Logo', type: 'text', placeholder: 'Brand/logo text' },
+    ],
+    defaultOptions: {
+      fontFamily: 'Last',
+      fontWeights: '10 weights + Italics',
+      charset: 'Latin Extended-A',
+      releaseDate: 'Sept. 2025',
+      stackedLines: ['RADIANCE', 'BASIC CHANNEL', '3 TRACKS', '30 MIN', '1994'],
+      lineSpacing: 'tight',
+      uppercase: true,
+      footerColumns: [
+        { label: 'Designed', value: 'by Tim Vanhille' },
+        { label: 'Produced', value: 'by Overtype' },
+      ],
+      centerLogo: 'overtype',
+    },
+  },
+
+  'manifesto-quotes': {
+    id: 'manifesto-quotes',
+    name: 'Manifesto + Quotes',
+    description: 'Statement with supporting quotes grid',
+    fields: [
+      { key: 'statementLines', label: 'Statement Lines', type: 'stringArray', required: true, helpText: 'Each line of the statement' },
+      { key: 'statementPunctuation', label: 'Punctuation', type: 'text', defaultValue: '.', placeholder: 'e.g., . or !' },
+      { key: 'statementVariant', label: 'Statement Size', type: 'select', defaultValue: 'hero', options: [
+        { value: 'hero', label: 'Hero' },
+        { value: 'display', label: 'Display' },
+        { value: 'headline', label: 'Headline' },
+      ]},
+      { key: 'supportingQuotes', label: 'Supporting Quotes', type: 'array', helpText: 'Quotes with attributions', itemSchema: [
+        { key: 'quote', label: 'Quote', type: 'textarea', required: true },
+        { key: 'author', label: 'Author', type: 'text', required: true },
+      ]},
+      { key: 'brandIcon', label: 'Brand Icon', type: 'text', placeholder: 'Icon character or symbol' },
+    ],
+    defaultOptions: {
+      statementLines: ['Stay', 'Simple', 'Stay', 'True'],
+      statementPunctuation: '.',
+      statementVariant: 'hero',
+      supportingQuotes: [
+        { quote: 'Everything should be made as simple as possible, but not simpler.', author: 'Albert Einstein' },
+        { quote: 'Simplicity is the ultimate sophistication.', author: 'Leonardo da Vinci' },
+        { quote: 'Simply the thing that I am shall make me live.', author: 'William Shakespeare' },
+      ],
+      brandIcon: '◼',
+    },
+  },
+
+  'numbered-principles': {
+    id: 'numbered-principles',
+    name: 'Numbered Principles',
+    description: 'Editorial numbered list (Dieter Rams style)',
+    fields: [
+      { key: 'titleBold', label: 'Title Bold', type: 'text', required: true, placeholder: 'e.g., Good' },
+      { key: 'titleRegular', label: 'Title Regular', type: 'text', required: true, placeholder: 'e.g., design is' },
+      { key: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'e.g., Ten Principles of good design :' },
+      { key: 'subtitleMeta', label: 'Subtitle Meta', type: 'text', placeholder: 'e.g., From Dieter Rams' },
+      { key: 'principles', label: 'Principles', type: 'array', required: true, helpText: 'Numbered principles list', itemSchema: [
+        { key: 'number', label: 'Number', type: 'number', required: true },
+        { key: 'keyword', label: 'Keyword', type: 'text', required: true },
+        { key: 'explanation', label: 'Explanation', type: 'textarea', required: true },
+        { key: 'translation', label: 'Translation', type: 'text' },
+      ]},
+      { key: 'taglineBold', label: 'Tagline Bold', type: 'text', placeholder: 'e.g., Less' },
+      { key: 'taglineRegular', label: 'Tagline Regular', type: 'text', placeholder: 'e.g., and More' },
+      { key: 'footerMeta', label: 'Footer Meta', type: 'text', placeholder: 'Designer credit' },
+    ],
+    defaultOptions: {
+      titleBold: 'Good',
+      titleRegular: 'design is',
+      subtitle: 'Ten Principles of good design :',
+      subtitleMeta: 'From Dieter Rams',
+      principles: [
+        { number: 1, keyword: 'innovate', explanation: 'Good design is innovative. The possibilities for innovation are not exhausted.', translation: '좋은 디자인은 혁신적이다' },
+        { number: 2, keyword: 'useful', explanation: 'Good design makes a product useful. A product is bought to be used.', translation: '좋은 디자인은 제품을 유용하게 한다' },
+        { number: 3, keyword: 'aesthetic', explanation: 'Good design is aesthetic. The aesthetic quality of a product is integral.', translation: '좋은 디자인은 아름답다' },
+      ],
+      taglineBold: 'Less',
+      taglineRegular: 'and More',
+      footerMeta: 'Poster design by Myungjoo Shin',
+    },
+  },
+
+  'two-tone-quote': {
+    id: 'two-tone-quote',
+    name: 'Two-Tone Quote',
+    description: 'Quote with alternating word colors (Tufte style)',
+    fields: [
+      { key: 'quote', label: 'Quote', type: 'textarea', required: true, placeholder: 'Enter quote text (use line breaks)', helpText: 'Use Enter/newline to break lines' },
+      { key: 'highlightedWords', label: 'Highlighted Words', type: 'stringArray', required: true, helpText: 'Words to display in accent color (white)' },
+      { key: 'author', label: 'Author', type: 'text', required: true, placeholder: 'Author name' },
+      { key: 'authorItalic', label: 'Author Italic', type: 'toggle', defaultValue: true },
+      { key: 'edgeText', label: 'Edge Text', type: 'text', placeholder: 'Small text at bottom' },
+    ],
+    defaultOptions: {
+      quote: 'Good design\nis a lot like\nclear thinking\nmade visual.',
+      highlightedWords: ['design', 'like', 'clear', 'visual'],
+      author: 'Edward Tufte',
+      authorItalic: true,
+      edgeText: '© 2010 Bibliotheca Alexandrina - Graphics Unit',
+    },
+  },
+
+  'split-statement': {
+    id: 'split-statement',
+    name: 'Split Statement',
+    description: 'Diagonal text flow with framed card (Empatia style)',
+    fields: [
+      { key: 'topLines', label: 'Top Lines', type: 'stringArray', required: true, helpText: 'Lines in top-left corner' },
+      { key: 'topInlineWord', label: 'Top Inline Word', type: 'text', placeholder: 'Small word after last line' },
+      { key: 'bottomWord', label: 'Bottom Word', type: 'text', required: true, placeholder: 'Large word bottom-right' },
+      { key: 'brandName', label: 'Brand Name', type: 'text', placeholder: 'Footer brand' },
+      { key: 'url', label: 'URL', type: 'text', placeholder: 'Footer URL' },
+      { key: 'framePadding', label: 'Frame Padding', type: 'number', defaultValue: 40 },
+      { key: 'cardPadding', label: 'Card Padding', type: 'number', defaultValue: 60 },
+    ],
+    defaultOptions: {
+      topLines: ['We', 'want', 'more', 'fucking'],
+      topInlineWord: 'good',
+      bottomWord: 'design.',
+      brandName: 'empatía.',
+      url: 'helloempatia.com',
+      framePadding: 40,
+      cardPadding: 60,
+    },
+  },
 };
 
 export function getPresetSchema(presetId: string): PresetSchema | undefined {

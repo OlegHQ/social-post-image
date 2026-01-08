@@ -16,6 +16,12 @@ export { brutalistConcrete } from './brutalist-concrete';
 export { techTerminal } from './tech-terminal';
 export { paperInk } from './paper-ink';
 export { swissRedInverted } from './swiss-red-inverted';
+export { neonGreen } from './neon-green';
+export { ramsBrown } from './rams-brown';
+export { tufteBlue } from './tufte-blue';
+export { empatiaMint } from './empatia-mint';
+export { vignelliOrange } from './vignelli-orange';
+export { ramsWarm } from './rams-warm';
 
 import type { Theme } from './types';
 import { swissRed } from './swiss-red';
@@ -31,6 +37,12 @@ import { brutalistConcrete } from './brutalist-concrete';
 import { techTerminal } from './tech-terminal';
 import { paperInk } from './paper-ink';
 import { swissRedInverted } from './swiss-red-inverted';
+import { neonGreen } from './neon-green';
+import { ramsBrown } from './rams-brown';
+import { tufteBlue } from './tufte-blue';
+import { empatiaMint } from './empatia-mint';
+import { vignelliOrange } from './vignelli-orange';
+import { ramsWarm } from './rams-warm';
 
 // Theme registry
 export const themes: Record<string, Theme> = {
@@ -47,6 +59,12 @@ export const themes: Record<string, Theme> = {
   'tech-terminal': techTerminal,
   'paper-ink': paperInk,
   'swiss-red-inverted': swissRedInverted,
+  'neon-green': neonGreen,
+  'rams-brown': ramsBrown,
+  'tufte-blue': tufteBlue,
+  'empatia-mint': empatiaMint,
+  'vignelli-orange': vignelliOrange,
+  'rams-warm': ramsWarm,
 };
 
 export type ThemePreset = keyof typeof themes;
