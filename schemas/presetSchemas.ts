@@ -490,7 +490,7 @@ export const presetSchemas: Record<string, PresetSchema> = {
         { key: 'translation', label: 'Translation', type: 'text' },
       ]},
       { key: 'taglineBold', label: 'Tagline Bold', type: 'text', placeholder: 'e.g., Less' },
-      { key: 'taglineRegular', label: 'Tagline Regular', type: 'text', placeholder: 'e.g., and More' },
+      { key: 'taglineAccent', label: 'Tagline Accent', type: 'text', placeholder: 'e.g., and More' },
       { key: 'footerMeta', label: 'Footer Meta', type: 'text', placeholder: 'Designer credit' },
     ],
     defaultOptions: {
@@ -504,7 +504,7 @@ export const presetSchemas: Record<string, PresetSchema> = {
         { number: 3, keyword: 'aesthetic', explanation: 'Good design is aesthetic. The aesthetic quality of a product is integral.', translation: '좋은 디자인은 아름답다' },
       ],
       taglineBold: 'Less',
-      taglineRegular: 'and More',
+      taglineAccent: 'and More',
       footerMeta: 'Poster design by Myungjoo Shin',
     },
   },

@@ -21,7 +21,7 @@ export interface NumberedPrinciplesOptions {
 
   // Footer
   taglineBold?: string;
-  taglineRegular?: string;
+  taglineAccent?: string;
   footerMeta?: string;
 
   theme?: ThemePreset;
@@ -35,12 +35,12 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
     subtitleMeta,
     principles,
     taglineBold,
-    taglineRegular,
+    taglineAccent,
     footerMeta,
     theme = 'rams-brown',
   } = options;
 
-  // Build principle row
+  // Build a single principle row
   const buildPrincipleRow = (principle: {
     number: number;
     keyword: string;
@@ -48,35 +48,36 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
     translation?: string;
   }): PrimitiveNode => ({
     type: 'grid',
-    columns: '40px 150px 1fr 1fr',
+    columns: '50px 1.4fr 1fr 1fr',
     gap: 3,
-    style: { marginBottom: '12px', alignItems: 'start' },
+    style: { marginBottom: '4px', alignItems: 'start' },
     children: [
-      // Number
+      // Number - thin weight, left aligned
       {
         type: 'text',
         content: String(principle.number),
-        variant: 'title',
+        variant: 'headline',
         color: 'foreground',
         style: {
-          fontWeight: '400',
+          fontSize: '48px',
+          fontWeight: '300',
           lineHeight: '1',
         },
       },
-      // Keyword
+      // Keyword - large, bold, orange/accent
       {
         type: 'text',
         content: `${principle.keyword}.`,
         variant: 'headline',
         color: 'accent',
         style: {
+          fontSize: '52px',
           fontWeight: '700',
           lineHeight: '1',
-          fontSize: '38px',
           letterSpacing: '-0.01em',
         },
       },
-      // Explanation
+      // Explanation column
       {
         type: 'stack',
         direction: 'vertical',
@@ -87,25 +88,37 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
             content: `${principle.number}.`,
             variant: 'meta',
             color: 'foreground',
-            style: { fontWeight: '700' },
+            style: {
+              fontSize: '9px',
+              fontWeight: '700',
+              marginBottom: '2px',
+            },
           },
           {
             type: 'text',
-            content: `Good design is ${principle.keyword.toLowerCase()}.`,
+            content: `Good design is ${principle.keyword}.`,
             variant: 'meta',
             color: 'foreground',
-            style: { fontWeight: '700' },
+            style: {
+              fontSize: '9px',
+              fontWeight: '700',
+              marginBottom: '4px',
+            },
           },
           {
             type: 'text',
             content: principle.explanation,
             variant: 'meta',
             color: 'foreground',
-            style: { lineHeight: '1.4', opacity: 0.85 },
+            style: {
+              fontSize: '9px',
+              lineHeight: '1.3',
+              opacity: '0.85',
+            },
           },
         ],
       },
-      // Translation (optional)
+      // Translation column (optional)
       ...(principle.translation
         ? [{
             type: 'stack' as const,
@@ -117,14 +130,22 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
                 content: `${principle.number}.`,
                 variant: 'meta' as const,
                 color: 'foreground' as const,
-                style: { fontWeight: '700' },
+                style: {
+                  fontSize: '9px',
+                  fontWeight: '700',
+                  marginBottom: '2px',
+                },
               },
               {
                 type: 'text' as const,
                 content: principle.translation,
                 variant: 'meta' as const,
                 color: 'foreground' as const,
-                style: { lineHeight: '1.4', opacity: 0.85 },
+                style: {
+                  fontSize: '9px',
+                  lineHeight: '1.3',
+                  opacity: '0.85',
+                },
               },
             ],
           }]
@@ -142,14 +163,15 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
     root: {
       type: 'stack',
       direction: 'vertical',
-      gap: 4,
+      gap: 0,
       style: { flex: 1 },
       children: [
-        // Title row
+        // Title row - "Good design is"
         {
           type: 'stack',
           direction: 'horizontal',
           gap: 2,
+          style: { marginBottom: '8px' },
           children: [
             {
               type: 'text',
@@ -157,8 +179,8 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
               variant: 'headline',
               color: 'foreground',
               style: {
-                fontSize: '72px',
-                fontWeight: '900',
+                fontSize: '58px',
+                fontWeight: '700',
                 letterSpacing: '-0.02em',
               },
             },
@@ -168,7 +190,7 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
               variant: 'headline',
               color: 'foreground',
               style: {
-                fontSize: '72px',
+                fontSize: '58px',
                 fontWeight: '300',
                 letterSpacing: '-0.02em',
               },
@@ -176,31 +198,46 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
           ],
         },
 
-        // Subtitle row
+        // Subtitle row - "Ten Principles..." and "From Dieter Rams"
         ...(subtitle || subtitleMeta
           ? [{
-              type: 'grid' as const,
-              columns: '1fr 1fr',
-              gap: 4 as const,
+              type: 'stack' as const,
+              direction: 'horizontal' as const,
+              justify: 'between' as const,
+              style: { marginBottom: '24px' },
               children: [
                 {
                   type: 'text' as const,
                   content: subtitle || '',
                   variant: 'body' as const,
                   color: 'foreground' as const,
+                  style: { fontSize: '14px' },
                 },
                 {
-                  type: 'text' as const,
-                  content: subtitleMeta || '',
-                  variant: 'body' as const,
-                  color: 'foreground' as const,
-                  style: { textAlign: 'right' as const },
+                  type: 'stack' as const,
+                  direction: 'vertical' as const,
+                  gap: 0 as const,
+                  style: { textAlign: 'right' },
+                  children: [
+                    {
+                      type: 'text' as const,
+                      content: 'From',
+                      variant: 'meta' as const,
+                      color: 'foreground' as const,
+                      style: { fontSize: '12px' },
+                    },
+                    {
+                      type: 'text' as const,
+                      content: subtitleMeta || '',
+                      variant: 'body' as const,
+                      color: 'foreground' as const,
+                      style: { fontSize: '14px', fontWeight: '700' },
+                    },
+                  ],
                 },
               ],
             }]
           : []),
-
-        { type: 'spacer', size: 2 },
 
         // Principles list
         {
@@ -212,12 +249,13 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
 
         { type: 'spacer', size: 'flex' },
 
-        // Footer tagline
-        ...(taglineBold || taglineRegular
+        // Footer tagline - "Less and More"
+        ...(taglineBold || taglineAccent
           ? [{
               type: 'stack' as const,
               direction: 'horizontal' as const,
-              gap: 2 as const,
+              gap: 3 as const,
+              style: { marginBottom: '8px' },
               children: [
                 ...(taglineBold
                   ? [{
@@ -225,23 +263,31 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
                       content: taglineBold,
                       variant: 'headline' as const,
                       color: 'foreground' as const,
-                      style: { fontWeight: '900' },
+                      style: {
+                        fontSize: '58px',
+                        fontWeight: '700',
+                        letterSpacing: '-0.02em',
+                      },
                     }]
                   : []),
-                ...(taglineRegular
+                ...(taglineAccent
                   ? [{
                       type: 'text' as const,
-                      content: taglineRegular,
+                      content: taglineAccent,
                       variant: 'headline' as const,
                       color: 'accent' as const,
-                      style: { fontWeight: '300' },
+                      style: {
+                        fontSize: '58px',
+                        fontWeight: '700',
+                        letterSpacing: '-0.02em',
+                      },
                     }]
                   : []),
               ],
             }]
           : []),
 
-        // Footer meta
+        // Footer meta - designer credit
         ...(footerMeta
           ? [{
               type: 'stack' as const,
@@ -251,7 +297,11 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
                 type: 'text' as const,
                 content: footerMeta,
                 variant: 'meta' as const,
-                color: 'muted' as const,
+                color: 'foreground' as const,
+                style: {
+                  fontSize: '9px',
+                  opacity: '0.7',
+                },
               }],
             }]
           : []),

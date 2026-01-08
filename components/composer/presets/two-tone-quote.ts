@@ -40,7 +40,7 @@ function buildQuoteLine(
         display: 'inline',
         fontWeight: '900',
         fontSize: '95px',
-        lineHeight: '1.05',
+        lineHeight: '0.92',
         letterSpacing: '-0.02em',
       },
     };
@@ -50,7 +50,6 @@ function buildQuoteLine(
     type: 'box',
     style: {
       display: 'block',
-      marginBottom: '4px',
     },
     children: lineContent,
   };
