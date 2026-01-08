@@ -52,6 +52,11 @@ export const themeReference: Record<ThemePreset, { description: string; mood: st
   'vignelli-cream': { description: 'Cream background with crimson accent', mood: 'elegant, classic' },
   'neue-teal': { description: 'Teal background with coral accent', mood: 'modern, typographic' },
   'orange-energy': { description: 'Warm white with vibrant orange', mood: 'energetic, innovative' },
+  'rams-warm': { description: 'Warm cream with brown tones (Dieter Rams style)', mood: 'functional, timeless' },
+  'rams-brown': { description: 'Brown/tan with orange accent', mood: 'editorial, classic' },
+  'neon-green': { description: 'Dark background with neon green', mood: 'tech, modern' },
+  'tufte-blue': { description: 'Deep blue with white accent', mood: 'intellectual, refined' },
+  'empatia-mint': { description: 'Mint green with dark text', mood: 'fresh, playful' },
 };
 
 // =============================================================================
@@ -911,6 +916,836 @@ export const templateSpecs: Record<string, TemplateSpec> = {
       'Content blocks use 2-column grid: shortLabel/subLabel on left, description on right',
       'shortLabel is great for numbering (TIP 01) or categories',
       'Block fields: title (40 chars), shortLabel (10 chars), subLabel (15 chars), badge (20 chars), description (50 chars)',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Minimal Quote (Dieter Rams style)
+  // ---------------------------------------------------------------------------
+  'minimal-quote': {
+    id: 'minimal-quote',
+    name: 'Minimal Quote',
+    description: 'A simple, clean quote poster with explanation paragraph. Inspired by Dieter Rams\' design philosophy of "less but better".',
+    bestFor: [
+      'Design philosophy quotes',
+      'Minimalist statements',
+      'Product design wisdom',
+      'Simple, focused messages',
+      'Dieter Rams tributes',
+    ],
+    linkedInContext: 'Use when sharing timeless design wisdom or simple truths. The clean layout emphasizes the quote without distraction.',
+    fieldGuides: {
+      quote: {
+        description: 'The main quote text.',
+        minChars: 20,
+        maxChars: 100,
+        examples: [
+          'Good design is as little design as possible.',
+          'Less, but better.',
+        ],
+        tips: 'Keep it concise. The power is in simplicity.',
+        required: true,
+        type: 'string',
+      },
+      explanation: {
+        description: 'Explanation or context for the quote.',
+        maxChars: 200,
+        examples: [
+          'Less, but better – because it concentrates on the essential aspects.',
+        ],
+        required: false,
+        type: 'string',
+      },
+      tagline: {
+        description: 'Additional tagline text.',
+        maxChars: 60,
+        examples: ['Back to purity, Back to simplicity.'],
+        required: false,
+        type: 'string',
+      },
+      author: {
+        description: 'Quote author name.',
+        maxChars: 40,
+        examples: ['Dieter Rams', 'Jony Ive'],
+        required: true,
+        type: 'string',
+      },
+      authorPrefix: {
+        description: 'Prefix before author name.',
+        maxChars: 5,
+        defaultValue: '~',
+        examples: ['~', '—', '-'],
+        required: false,
+        type: 'string',
+      },
+      brand: {
+        description: 'Footer brand name.',
+        maxChars: 30,
+        required: false,
+        type: 'string',
+      },
+      showIcon: {
+        description: 'Show decorative icon (Braun radio style).',
+        defaultValue: true,
+        required: false,
+        type: 'boolean',
+      },
+      theme: {
+        description: 'Color theme.',
+        examples: ['rams-warm', 'monochrome'],
+        defaultValue: 'rams-warm',
+        required: false,
+        type: 'string',
+      },
+    },
+    exampleConfig: {
+      quote: 'Good design is as little design as possible.',
+      explanation: 'Less, but better – because it concentrates on the essential aspects, and the products are not burdened with non-essentials.',
+      tagline: 'Back to purity, Back to simplicity.',
+      author: 'Dieter Rams',
+      authorPrefix: '~',
+      brand: 'STARTUPVITAMINS',
+      showIcon: true,
+      theme: 'rams-warm',
+    },
+    designNotes: [
+      'The quote should be the hero - keep it short and impactful',
+      'Use the explanation to add context without cluttering',
+      'The warm theme evokes Braun/Rams design aesthetic',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Paragraph Quote (Müller-Brockmann style)
+  // ---------------------------------------------------------------------------
+  'paragraph-quote': {
+    id: 'paragraph-quote',
+    name: 'Paragraph Quote',
+    description: 'Multi-paragraph quote poster inspired by Josef Müller-Brockmann\'s grid-based typography. Perfect for longer quotes that need structure.',
+    bestFor: [
+      'Longer quotes requiring multiple paragraphs',
+      'Grid system philosophy',
+      'Swiss design tributes',
+      'Educational content',
+      'Book excerpts',
+    ],
+    linkedInContext: 'Use when sharing wisdom that requires multiple sentences. The paragraph structure maintains readability while looking sophisticated.',
+    fieldGuides: {
+      paragraphs: {
+        description: 'Array of paragraph texts.',
+        examples: [
+          '["The grid system is an aid, not a guarantee.", "It permits a number of possible uses.", "One must learn how to use the grid."]',
+        ],
+        tips: 'Use 2-4 paragraphs. Each should be a complete thought.',
+        required: true,
+        type: 'array',
+      },
+      paragraphGap: {
+        description: 'Spacing between paragraphs.',
+        examples: ['small', 'medium', 'large'],
+        defaultValue: 'medium',
+        required: false,
+        type: 'string',
+      },
+      author: {
+        description: 'Quote author name.',
+        maxChars: 50,
+        examples: ['Josef Müller-Brockmann'],
+        required: true,
+        type: 'string',
+      },
+      authorPrefix: {
+        description: 'Prefix before author name.',
+        maxChars: 5,
+        defaultValue: '—',
+        required: false,
+        type: 'string',
+      },
+      cornerText: {
+        description: 'Small text in corner.',
+        maxChars: 50,
+        required: false,
+        type: 'string',
+      },
+      showGridLines: {
+        description: 'Show decorative grid overlay.',
+        defaultValue: false,
+        required: false,
+        type: 'boolean',
+      },
+      theme: {
+        description: 'Color theme.',
+        examples: ['swiss-red-inverted', 'swiss-red'],
+        defaultValue: 'swiss-red-inverted',
+        required: false,
+        type: 'string',
+      },
+    },
+    exampleConfig: {
+      paragraphs: [
+        'The grid system is an aid, not a guarantee.',
+        'It permits a number of possible uses and each designer can look for a solution appropriate to his personal style.',
+        'But one must learn how to use the grid; it is an art that requires practice.',
+      ],
+      paragraphGap: 'medium',
+      author: 'Josef Müller-Brockmann',
+      authorPrefix: '—',
+      theme: 'swiss-red-inverted',
+    },
+    designNotes: [
+      'Each paragraph should be a distinct thought',
+      'The red inverted theme is classic Müller-Brockmann',
+      'Keep paragraphs similar in length for visual balance',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Split Word (Vignelli tribute)
+  // ---------------------------------------------------------------------------
+  'split-word': {
+    id: 'split-word',
+    name: 'Split Word',
+    description: 'Giant word split dramatically across two lines, inspired by Vignelli\'s "Forever" poster. Creates strong visual impact.',
+    bestFor: [
+      'Single powerful words',
+      'Brand statements',
+      'Vignelli tributes',
+      'Dramatic visual impact',
+      'Emotional messages',
+    ],
+    linkedInContext: 'Use when you want maximum visual impact with a single word or concept. The split creates drama and memorability.',
+    fieldGuides: {
+      url: {
+        description: 'URL text displayed at top.',
+        maxChars: 40,
+        required: false,
+        type: 'string',
+      },
+      wordPart1: {
+        description: 'First part of the split word.',
+        minChars: 2,
+        maxChars: 10,
+        examples: ['For', 'To', 'Be'],
+        tips: 'Usually 2-4 characters.',
+        required: true,
+        type: 'string',
+      },
+      wordPart2: {
+        description: 'Second part of the split word.',
+        minChars: 2,
+        maxChars: 10,
+        examples: ['ever.', 'gether.', 'yond.'],
+        tips: 'Include punctuation if desired.',
+        required: true,
+        type: 'string',
+      },
+      wordColor: {
+        description: 'Color of the split word.',
+        examples: ['foreground', 'accent'],
+        defaultValue: 'accent',
+        required: false,
+        type: 'string',
+      },
+      supportingQuote: {
+        description: 'Quote below the split word.',
+        maxChars: 80,
+        examples: ['If you do it right, it will last forever.'],
+        required: false,
+        type: 'string',
+      },
+      bioColumns: {
+        description: 'Footer bio columns (max 3).',
+        type: 'array',
+        examples: [
+          '[{ "primary": "Massimo Vignelli", "secondary": "1931-2014" }]',
+        ],
+        required: false,
+      },
+      theme: {
+        description: 'Color theme.',
+        examples: ['monochrome', 'swiss-red'],
+        defaultValue: 'monochrome',
+        required: false,
+        type: 'string',
+      },
+    },
+    exampleConfig: {
+      url: 'thefutur.com',
+      wordPart1: 'For',
+      wordPart2: 'ever.',
+      wordColor: 'accent',
+      supportingQuote: 'If you do it right, it will last forever.',
+      bioColumns: [
+        { primary: 'Massimo Vignelli', secondary: '1931-2014' },
+        { primary: 'Graphic Designer', secondary: 'Industrial Designer', tertiary: 'Architect' },
+        { primary: 'Vignelli Associates', secondary: 'Unimark International' },
+      ],
+      theme: 'monochrome',
+    },
+    designNotes: [
+      'The word split should create natural reading rhythm',
+      'Red accent on monochrome creates the classic Vignelli look',
+      'The supporting quote adds context without competing',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Vignelli Enhanced
+  // ---------------------------------------------------------------------------
+  'vignelli-enhanced': {
+    id: 'vignelli-enhanced',
+    name: 'Vignelli Enhanced',
+    description: 'Advanced Vignelli-style quote poster with 4-column header metadata and customizable footer. More structured than the basic Vignelli quote.',
+    bestFor: [
+      'Detailed quote attribution',
+      'Design series with metadata',
+      'Professional portfolios',
+      'Structured wisdom sharing',
+      'Design history content',
+    ],
+    linkedInContext: 'Use for comprehensive quote presentations where context and attribution matter. The header columns can include biographical or contextual information.',
+    fieldGuides: {
+      seriesTitle: {
+        description: 'Series title text.',
+        maxChars: 50,
+        defaultValue: 'Five phrases to live by:',
+        required: false,
+        type: 'string',
+      },
+      authorName: {
+        description: 'Author name for header.',
+        maxChars: 40,
+        defaultValue: 'Massimo Vignelli',
+        required: false,
+        type: 'string',
+      },
+      headerColumns: {
+        description: 'Array of meta text for 4-column header.',
+        type: 'array',
+        tips: 'Up to 4 columns of contextual information.',
+        required: false,
+      },
+      quote: {
+        description: 'The full quote text.',
+        minChars: 30,
+        maxChars: 200,
+        required: true,
+        type: 'string',
+      },
+      emphasisPhrase: {
+        description: 'Key phrase to emphasize (must be in quote).',
+        minChars: 10,
+        maxChars: 60,
+        tips: 'Must be exact substring of quote.',
+        required: true,
+        type: 'string',
+      },
+      quoteItalic: {
+        description: 'Display quote in italic.',
+        defaultValue: true,
+        required: false,
+        type: 'boolean',
+      },
+      quoteVariant: {
+        description: 'Typography size for quote.',
+        examples: ['subhead', 'title'],
+        defaultValue: 'subhead',
+        required: false,
+        type: 'string',
+      },
+      emphasisVariant: {
+        description: 'Typography size for emphasis.',
+        examples: ['display', 'hero'],
+        defaultValue: 'display',
+        required: false,
+        type: 'string',
+      },
+      bioColumns: {
+        description: 'Footer bio columns.',
+        type: 'array',
+        required: false,
+      },
+      seriesNumber: {
+        description: 'Number in series (displayed large).',
+        defaultValue: 2,
+        required: false,
+        type: 'number',
+      },
+      theme: {
+        description: 'Color theme.',
+        examples: ['vignelli-gold', 'vignelli-cream'],
+        defaultValue: 'vignelli-gold',
+        required: false,
+        type: 'string',
+      },
+    },
+    exampleConfig: {
+      seriesTitle: 'Five phrases to live by:',
+      authorName: 'Massimo Vignelli',
+      headerColumns: [
+        'Vignelli-isms Poster series. In recognition of his outstanding contribution to the world of graphic design.',
+        'On the evening of Tuesday, March 8, The Architectural League gave its President\'s Medal to Lella and Massimo Vignelli.',
+        'In 1971, Massimo founded Vignelli Associates with his wife, Lella.',
+        'Vignelli was involved with filmmaker Gary Hustwit in the documentary Helvetica.',
+      ],
+      quote: 'We like design to be visually powerful, intellectually elegant, and above all timeless.',
+      emphasisPhrase: 'visually powerful, intellectually elegant.',
+      quoteItalic: true,
+      seriesNumber: 2,
+      theme: 'vignelli-gold',
+    },
+    designNotes: [
+      'The emphasis phrase MUST be an exact substring of the quote',
+      'Header columns provide rich context without overwhelming',
+      'Gold theme creates premium, wisdom-focused aesthetic',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Type Specimen
+  // ---------------------------------------------------------------------------
+  'type-specimen': {
+    id: 'type-specimen',
+    name: 'Type Specimen',
+    description: 'Font showcase poster with stacked typography lines. Perfect for celebrating typefaces or creating visual rhythm with text.',
+    bestFor: [
+      'Font announcements',
+      'Typography appreciation',
+      'Music/album aesthetics',
+      'Stacked word compositions',
+      'Creative portfolio pieces',
+    ],
+    linkedInContext: 'Use when highlighting typography or creating visually striking text compositions. Works well for creative professionals.',
+    fieldGuides: {
+      fontFamily: {
+        description: 'Font family name.',
+        maxChars: 25,
+        examples: ['Last', 'Helvetica', 'Founders'],
+        required: true,
+        type: 'string',
+      },
+      fontWeights: {
+        description: 'Weight description.',
+        maxChars: 30,
+        defaultValue: '10 weights + Italics',
+        required: false,
+        type: 'string',
+      },
+      charset: {
+        description: 'Character set description.',
+        maxChars: 30,
+        defaultValue: 'Latin Extended-A',
+        required: false,
+        type: 'string',
+      },
+      releaseDate: {
+        description: 'Release date text.',
+        maxChars: 20,
+        examples: ['Sept. 2025'],
+        required: false,
+        type: 'string',
+      },
+      stackedLines: {
+        description: 'Array of text lines to stack.',
+        type: 'array',
+        examples: ['["RADIANCE", "BASIC CHANNEL", "3 TRACKS", "30 MIN", "1994"]'],
+        tips: '3-6 short lines work best.',
+        required: true,
+      },
+      lineSpacing: {
+        description: 'Vertical spacing between lines.',
+        examples: ['tight', 'normal', 'loose'],
+        defaultValue: 'tight',
+        required: false,
+        type: 'string',
+      },
+      uppercase: {
+        description: 'Display text in uppercase.',
+        defaultValue: true,
+        required: false,
+        type: 'boolean',
+      },
+      footerColumns: {
+        description: 'Footer credit columns.',
+        type: 'array',
+        required: false,
+      },
+      centerLogo: {
+        description: 'Center brand/logo text.',
+        maxChars: 30,
+        required: false,
+        type: 'string',
+      },
+      theme: {
+        description: 'Color theme.',
+        examples: ['neon-green', 'monochrome'],
+        defaultValue: 'neon-green',
+        required: false,
+        type: 'string',
+      },
+    },
+    exampleConfig: {
+      fontFamily: 'Last',
+      fontWeights: '10 weights + Italics',
+      charset: 'Latin Extended-A',
+      releaseDate: 'Sept. 2025',
+      stackedLines: ['RADIANCE', 'BASIC CHANNEL', '3 TRACKS', '30 MIN', '1994'],
+      lineSpacing: 'tight',
+      uppercase: true,
+      footerColumns: [
+        { label: 'Designed', value: 'by Tim Vanhille' },
+        { label: 'Produced', value: 'by Overtype' },
+      ],
+      centerLogo: 'overtype',
+      theme: 'neon-green',
+    },
+    designNotes: [
+      'Stacked lines create visual rhythm',
+      'Tight spacing maximizes impact',
+      'Neon green theme gives tech/music aesthetic',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Manifesto Quotes
+  // ---------------------------------------------------------------------------
+  'manifesto-quotes': {
+    id: 'manifesto-quotes',
+    name: 'Manifesto + Quotes',
+    description: 'Bold statement words on the left with supporting quotes in an asymmetric two-column layout. Creates dramatic visual hierarchy.',
+    bestFor: [
+      'Manifesto statements',
+      'Core values',
+      'Philosophy with supporting evidence',
+      'Dramatic declarations',
+      'Mission statements',
+    ],
+    linkedInContext: 'Use when making bold statements backed by supporting quotes. The asymmetric layout draws attention to your main message.',
+    fieldGuides: {
+      statementLines: {
+        description: 'Array of statement words (one per line).',
+        type: 'array',
+        examples: ['["Stay", "Simple", "Stay", "True"]'],
+        tips: 'Use 2-5 short, impactful words.',
+        required: true,
+      },
+      statementPunctuation: {
+        description: 'Punctuation after last word.',
+        maxChars: 3,
+        defaultValue: '.',
+        required: false,
+        type: 'string',
+      },
+      statementVariant: {
+        description: 'Typography size.',
+        examples: ['hero', 'display', 'headline'],
+        defaultValue: 'hero',
+        required: false,
+        type: 'string',
+      },
+      supportingQuotes: {
+        description: 'Array of supporting quotes with authors.',
+        type: 'array',
+        examples: ['[{ "quote": "Everything should be made as simple as possible.", "author": "Albert Einstein" }]'],
+        tips: 'Use 2-4 quotes that reinforce the statement.',
+        required: false,
+      },
+      brandIcon: {
+        description: 'Brand icon character.',
+        maxChars: 5,
+        examples: ['◼', '●', '▲'],
+        required: false,
+        type: 'string',
+      },
+      theme: {
+        description: 'Color theme.',
+        examples: ['monochrome', 'swiss-red'],
+        defaultValue: 'monochrome',
+        required: false,
+        type: 'string',
+      },
+    },
+    exampleConfig: {
+      statementLines: ['Stay', 'Simple', 'Stay', 'True'],
+      statementPunctuation: '.',
+      statementVariant: 'hero',
+      supportingQuotes: [
+        { quote: 'Everything should be made as simple as possible, but not simpler.', author: 'Albert Einstein' },
+        { quote: 'Simplicity is the ultimate sophistication.', author: 'Leonardo da Vinci' },
+        { quote: 'Simply the thing that I am shall make me live.', author: 'William Shakespeare' },
+      ],
+      brandIcon: '◼',
+      theme: 'monochrome',
+    },
+    designNotes: [
+      'Statement words should be single words for maximum impact',
+      'Supporting quotes should reinforce the main message',
+      'Monochrome keeps focus on the typography',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Numbered Principles
+  // ---------------------------------------------------------------------------
+  'numbered-principles': {
+    id: 'numbered-principles',
+    name: 'Numbered Principles',
+    description: 'Editorial numbered list layout inspired by Dieter Rams\' 10 Principles of Good Design. Perfect for structured wisdom.',
+    bestFor: [
+      'Design principles',
+      'Numbered lists',
+      'Rules and guidelines',
+      'Educational content',
+      'Dieter Rams tributes',
+    ],
+    linkedInContext: 'Use when sharing structured principles or rules. The numbered format makes content scannable and memorable.',
+    fieldGuides: {
+      titleBold: {
+        description: 'Bold part of title.',
+        maxChars: 20,
+        examples: ['Good', 'Great', 'Better'],
+        required: true,
+        type: 'string',
+      },
+      titleRegular: {
+        description: 'Regular weight part of title.',
+        maxChars: 30,
+        examples: ['design is', 'leaders do', 'teams have'],
+        required: true,
+        type: 'string',
+      },
+      subtitle: {
+        description: 'Subtitle text.',
+        maxChars: 50,
+        examples: ['Ten Principles of good design :'],
+        required: false,
+        type: 'string',
+      },
+      subtitleMeta: {
+        description: 'Attribution text.',
+        maxChars: 30,
+        examples: ['Dieter Rams', 'Warren Buffett'],
+        required: false,
+        type: 'string',
+      },
+      principles: {
+        description: 'Array of principles with number, keyword, explanation.',
+        type: 'array',
+        examples: ['[{ "number": 1, "keyword": "innovate", "explanation": "Good design is innovative." }]'],
+        tips: 'Include 3-10 principles. Each needs number, keyword, and explanation.',
+        required: true,
+      },
+      taglineBold: {
+        description: 'Bold tagline text.',
+        maxChars: 20,
+        examples: ['Less'],
+        required: false,
+        type: 'string',
+      },
+      taglineAccent: {
+        description: 'Accent colored tagline text.',
+        maxChars: 20,
+        examples: ['and More'],
+        required: false,
+        type: 'string',
+      },
+      footerMeta: {
+        description: 'Footer credit text.',
+        maxChars: 50,
+        required: false,
+        type: 'string',
+      },
+      theme: {
+        description: 'Color theme.',
+        examples: ['rams-brown', 'monochrome'],
+        defaultValue: 'rams-brown',
+        required: false,
+        type: 'string',
+      },
+    },
+    exampleConfig: {
+      titleBold: 'Good',
+      titleRegular: 'design is',
+      subtitle: 'Ten Principles of good design :',
+      subtitleMeta: 'Dieter Rams',
+      principles: [
+        { number: 1, keyword: 'innovate', explanation: 'Good design is innovative. The possibilities for innovation are not exhausted.', translation: '좋은 디자인은 혁신적이다' },
+        { number: 2, keyword: 'useful', explanation: 'Good design makes a product useful. A product is bought to be used.', translation: '좋은 디자인은 제품을 유용하게 한다' },
+        { number: 3, keyword: 'aesthetic', explanation: 'Good design is aesthetic. The aesthetic quality of a product is integral.', translation: '좋은 디자인은 아름답다' },
+      ],
+      taglineBold: 'Less',
+      taglineAccent: 'and More',
+      footerMeta: 'Poster design by Myungjoo Shin',
+      theme: 'rams-brown',
+    },
+    designNotes: [
+      'Keywords should be single-word summaries',
+      'The 4-column grid creates structured hierarchy',
+      'Brown theme evokes Dieter Rams aesthetic',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Two-Tone Quote
+  // ---------------------------------------------------------------------------
+  'two-tone-quote': {
+    id: 'two-tone-quote',
+    name: 'Two-Tone Quote',
+    description: 'Quote with alternating word colors, inspired by Edward Tufte\'s information design. Highlights key words in a different color.',
+    bestFor: [
+      'Emphasizing specific words',
+      'Visual information design',
+      'Creative typography',
+      'Edward Tufte tributes',
+      'Memorable quotes',
+    ],
+    linkedInContext: 'Use when you want to emphasize specific words within a quote. The color contrast draws attention to key concepts.',
+    fieldGuides: {
+      quote: {
+        description: 'Quote text (use \\n for line breaks).',
+        minChars: 20,
+        maxChars: 150,
+        examples: ['Good design\\nis a lot like\\nclear thinking\\nmade visual.'],
+        tips: 'Break into 3-5 lines for visual rhythm.',
+        required: true,
+        type: 'string',
+      },
+      highlightedWords: {
+        description: 'Array of words to highlight in accent color.',
+        type: 'array',
+        examples: ['["design", "like", "clear", "visual"]'],
+        tips: 'Choose key concept words (4-8 words).',
+        required: true,
+      },
+      author: {
+        description: 'Author name.',
+        maxChars: 40,
+        examples: ['Edward Tufte'],
+        required: true,
+        type: 'string',
+      },
+      authorItalic: {
+        description: 'Display author in italic.',
+        defaultValue: true,
+        required: false,
+        type: 'boolean',
+      },
+      edgeText: {
+        description: 'Small text at bottom edge.',
+        maxChars: 60,
+        required: false,
+        type: 'string',
+      },
+      theme: {
+        description: 'Color theme.',
+        examples: ['tufte-blue', 'monochrome'],
+        defaultValue: 'tufte-blue',
+        required: false,
+        type: 'string',
+      },
+    },
+    exampleConfig: {
+      quote: 'Good design\nis a lot like\nclear thinking\nmade visual.',
+      highlightedWords: ['design', 'like', 'clear', 'visual'],
+      author: 'Edward Tufte',
+      authorItalic: true,
+      edgeText: '© 2010 Bibliotheca Alexandrina - Graphics Unit',
+      theme: 'tufte-blue',
+    },
+    designNotes: [
+      'Highlighted words should be evenly distributed',
+      'The blue theme creates an intellectual, refined feel',
+      'Line breaks control reading rhythm',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Split Statement
+  // ---------------------------------------------------------------------------
+  'split-statement': {
+    id: 'split-statement',
+    name: 'Split Statement',
+    description: 'Playful diagonal text flow with a framed card layout. Inspired by Empatia\'s bold typographic style.',
+    bestFor: [
+      'Bold brand statements',
+      'Playful messaging',
+      'Creative agency style',
+      'Call-to-action posts',
+      'Design manifestos',
+    ],
+    linkedInContext: 'Use for bold, attention-grabbing statements. The split layout and colored card create visual interest and memorability.',
+    fieldGuides: {
+      topLines: {
+        description: 'Array of words for top-left (one per line).',
+        type: 'array',
+        examples: ['["We", "want", "more", "fucking"]'],
+        tips: 'Use 3-5 short words building to a punchline.',
+        required: true,
+      },
+      topInlineWord: {
+        description: 'Small word after last top line.',
+        maxChars: 15,
+        examples: ['good'],
+        required: false,
+        type: 'string',
+      },
+      bottomWord: {
+        description: 'Large word at bottom-right.',
+        minChars: 3,
+        maxChars: 15,
+        examples: ['design.', 'creativity.', 'impact.'],
+        tips: 'This is the punchline - make it count.',
+        required: true,
+        type: 'string',
+      },
+      brandName: {
+        description: 'Brand name for footer.',
+        maxChars: 30,
+        examples: ['empatía.'],
+        required: false,
+        type: 'string',
+      },
+      url: {
+        description: 'URL for footer.',
+        maxChars: 40,
+        examples: ['helloempatia.com'],
+        required: false,
+        type: 'string',
+      },
+      framePadding: {
+        description: 'Padding around outer frame (px).',
+        defaultValue: 40,
+        required: false,
+        type: 'number',
+      },
+      cardPadding: {
+        description: 'Padding inside card (px).',
+        defaultValue: 60,
+        required: false,
+        type: 'number',
+      },
+      theme: {
+        description: 'Color theme.',
+        examples: ['empatia-mint', 'orange-energy'],
+        defaultValue: 'empatia-mint',
+        required: false,
+        type: 'string',
+      },
+    },
+    exampleConfig: {
+      topLines: ['We', 'want', 'more', 'fucking'],
+      topInlineWord: 'good',
+      bottomWord: 'design.',
+      brandName: 'empatía.',
+      url: 'helloempatia.com',
+      framePadding: 40,
+      cardPadding: 60,
+      theme: 'empatia-mint',
+    },
+    designNotes: [
+      'The diagonal flow creates visual tension',
+      'Bottom word is the payoff - choose carefully',
+      'Mint theme gives fresh, modern agency feel',
     ],
   },
 };

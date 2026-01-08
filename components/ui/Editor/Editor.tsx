@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { useDesign } from '@/context/DesignContext';
 import { presetSchemas } from '@/schemas/presetSchemas';
 import { FieldRenderer } from './FieldRenderer';
 import styles from './Editor.module.css';
 
 export function Editor() {
+  const [isExpanded, setIsExpanded] = useState(false);
   const { state, updatePresetOption } = useDesign();
   const { activePreset, presetOptions } = state;
 
@@ -32,21 +34,30 @@ export function Editor() {
 
   return (
     <div className={styles.editor}>
-      <div className={styles.header}>
-        <h3 className={styles.title}>Content</h3>
-        <p className={styles.description}>{schema.description}</p>
-      </div>
+      <button
+        className={styles.header}
+        onClick={() => setIsExpanded(!isExpanded)}
+        type="button"
+      >
+        <div className={styles.headerContent}>
+          <h3 className={styles.title}>Content</h3>
+          <p className={styles.description}>{schema.description}</p>
+        </div>
+        <span className={styles.expandIcon}>{isExpanded ? '-' : '+'}</span>
+      </button>
 
-      <div className={styles.fields}>
-        {schema.fields.map((field) => (
-          <FieldRenderer
-            key={field.key}
-            field={field}
-            value={presetOptions[field.key]}
-            onChange={(value) => updatePresetOption(field.key, value)}
-          />
-        ))}
-      </div>
+      {isExpanded && (
+        <div className={styles.fields}>
+          {schema.fields.map((field) => (
+            <FieldRenderer
+              key={field.key}
+              field={field}
+              value={presetOptions[field.key]}
+              onChange={(value) => updatePresetOption(field.key, value)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useDesign } from '@/context/DesignContext';
 import { getTemplateIds, templateSpecs } from '@/schemas/templateSpecs';
+import { presetSchemas } from '@/schemas/presetSchemas';
 import type { ThemePreset } from '@/lib/types';
 import styles from './AIGenerator.module.css';
 
@@ -14,6 +15,12 @@ interface GenerateResult {
 }
 
 type GeneratorState = 'idle' | 'loading' | 'success' | 'error';
+
+interface SavedState {
+  activePreset: string | null;
+  presetOptions: Record<string, unknown>;
+  theme: ThemePreset;
+}
 
 const ALL_TEMPLATES = getTemplateIds();
 
@@ -45,7 +52,7 @@ function formatTemplateId(id: string): string {
 export function AIGenerator() {
   const [postText, setPostText] = useState('');
   const [selectedTemplates, setSelectedTemplates] = useState<string[]>([]);
-  const [state, setState] = useState<GeneratorState>('idle');
+  const [generatorState, setGeneratorState] = useState<GeneratorState>('idle');
   const [error, setError] = useState<string | null>(null);
   const [variants, setVariants] = useState<GenerateResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -53,8 +60,54 @@ export function AIGenerator() {
   const [progressMessage, setProgressMessage] = useState<string>('');
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const savedStateRef = useRef<SavedState | null>(null);
+  const isPreviewingRef = useRef(false);
 
-  const { setPreset, updatePresetOptions, setTheme } = useDesign();
+  const { state: designState, setPreset, updatePresetOptions, setTheme } = useDesign();
+
+  // Handle hover preview - show template's default example in main canvas
+  const handleTemplateHover = useCallback((templateId: string) => {
+    // Don't preview during loading
+    if (generatorState === 'loading') return;
+
+    // Save current state if not already previewing
+    if (!isPreviewingRef.current) {
+      savedStateRef.current = {
+        activePreset: designState.activePreset,
+        presetOptions: { ...designState.presetOptions },
+        theme: (designState.definition?.theme?.preset || 'swiss-red') as ThemePreset,
+      };
+      isPreviewingRef.current = true;
+    }
+
+    // Get the template's default config and theme
+    const templateSpec = templateSpecs[templateId];
+    const presetSchema = presetSchemas[templateId];
+
+    if (presetSchema) {
+      const defaultOptions = presetSchema.defaultOptions;
+      const defaultTheme = (templateSpec?.exampleConfig?.theme || defaultOptions.theme || 'swiss-red') as ThemePreset;
+
+      // Temporarily show the preview
+      setPreset(templateId, defaultOptions);
+      setTheme(defaultTheme);
+    }
+  }, [generatorState, designState.activePreset, designState.presetOptions, designState.definition?.theme?.preset, setPreset, setTheme]);
+
+  const handleTemplateLeave = useCallback(() => {
+    // Restore saved state
+    if (isPreviewingRef.current && savedStateRef.current) {
+      const { activePreset, presetOptions, theme } = savedStateRef.current;
+
+      if (activePreset) {
+        setPreset(activePreset, presetOptions);
+        setTheme(theme);
+      }
+
+      savedStateRef.current = null;
+      isPreviewingRef.current = false;
+    }
+  }, [setPreset, setTheme]);
 
   const toggleTemplate = (templateId: string) => {
     setSelectedTemplates((prev) =>
@@ -81,7 +134,7 @@ export function AIGenerator() {
     }
     abortControllerRef.current = new AbortController();
 
-    setState('loading');
+    setGeneratorState('loading');
     setError(null);
     setVariants([]);
     setSelectedIndex(null);
@@ -155,7 +208,7 @@ export function AIGenerator() {
               }
 
               if (parsed.success) {
-                setState('success');
+                setGeneratorState('success');
                 setProgressMessage('');
               }
             } catch (e) {
@@ -192,7 +245,7 @@ export function AIGenerator() {
       }
 
       if (receivedVariants.length > 0) {
-        setState('success');
+        setGeneratorState('success');
         setProgressMessage('');
       } else {
         throw new Error('No valid designs generated');
@@ -203,7 +256,7 @@ export function AIGenerator() {
         return; // Request was cancelled
       }
       setError(err instanceof Error ? err.message : 'Unknown error');
-      setState('error');
+      setGeneratorState('error');
       setProgressMessage('');
     }
   };
@@ -228,7 +281,7 @@ export function AIGenerator() {
     }
     setPostText('');
     setSelectedTemplates([]);
-    setState('idle');
+    setGeneratorState('idle');
     setError(null);
     setVariants([]);
     setSelectedIndex(null);
@@ -255,7 +308,7 @@ export function AIGenerator() {
             value={postText}
             onChange={(e) => setPostText(e.target.value)}
             rows={4}
-            disabled={state === 'loading'}
+            disabled={generatorState === 'loading'}
           />
 
           <div className={styles.charCount}>
@@ -269,15 +322,19 @@ export function AIGenerator() {
             <div className={styles.templateLabel}>
               Select templates ({selectedTemplates.length} selected)
             </div>
-            <div className={styles.templateGrid}>
+            <div
+              className={styles.templateGrid}
+              onMouseLeave={handleTemplateLeave}
+            >
               {ALL_TEMPLATES.map((templateId) => (
                 <button
                   key={templateId}
                   type="button"
                   className={`${styles.templateChip} ${selectedTemplates.includes(templateId) ? styles.templateChipSelected : ''}`}
                   onClick={() => toggleTemplate(templateId)}
-                  disabled={state === 'loading'}
-                  title={templateSpecs[templateId].description}
+                  onMouseEnter={() => handleTemplateHover(templateId)}
+                  disabled={generatorState === 'loading'}
+                  title={templateSpecs[templateId]?.description || ''}
                 >
                   {formatTemplateId(templateId)}
                 </button>
@@ -289,10 +346,10 @@ export function AIGenerator() {
             <button
               className={styles.generateButton}
               onClick={handleGenerate}
-              disabled={state === 'loading' || postText.length < 50 || selectedTemplates.length === 0}
+              disabled={generatorState === 'loading' || postText.length < 50 || selectedTemplates.length === 0}
               type="button"
             >
-              {state === 'loading' ? (
+              {generatorState === 'loading' ? (
                 <>
                   <span className={styles.spinner} />
                   {progressMessage || `Generating ${selectedTemplates.length} design${selectedTemplates.length !== 1 ? 's' : ''}...`}
@@ -319,7 +376,7 @@ export function AIGenerator() {
           {variants.length > 0 && (
             <div className={styles.variantsSection}>
               <div className={styles.variantsLabel}>
-                {state === 'loading'
+                {generatorState === 'loading'
                   ? `Received ${variants.length} of ${selectedTemplates.length}...`
                   : `Click to preview (${variants.length} design${variants.length !== 1 ? 's' : ''})`
                 }
