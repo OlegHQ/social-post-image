@@ -57,7 +57,7 @@ export function createTypeSpecimen(options: TypeSpecimenOptions): PosterDefiniti
       variant: 'hero' as const,
       color: 'foreground' as const,
       style: {
-        fontSize: '80px',
+        fontSize: '95px',
         fontWeight: '900',
         lineHeight: lineHeightMap[lineSpacing],
         letterSpacing: '-0.02em',

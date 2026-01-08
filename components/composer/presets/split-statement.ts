@@ -56,9 +56,10 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
               variant: 'headline',
               color: 'foreground',
               style: {
-                fontSize: '56px',
+                fontSize: '85px',
                 fontWeight: '700',
                 lineHeight: '0.95',
+                letterSpacing: '-0.02em',
               },
             },
             {
@@ -67,9 +68,10 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
               variant: 'body',
               color: 'foreground',
               style: {
-                fontSize: '18px',
+                fontSize: '24px',
                 fontWeight: '400',
                 alignSelf: 'flex-end',
+                marginBottom: '12px',
               },
             },
           ],
@@ -81,9 +83,10 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
           variant: 'headline',
           color: 'foreground',
           style: {
-            fontSize: '56px',
+            fontSize: '85px',
             fontWeight: '700',
             lineHeight: '0.95',
+            letterSpacing: '-0.02em',
           },
         });
       }
@@ -142,9 +145,10 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
                   variant: 'headline',
                   color: 'foreground',
                   style: {
-                    fontSize: '72px',
+                    fontSize: '110px',
                     fontWeight: '700',
                     textAlign: 'right',
+                    letterSpacing: '-0.02em',
                   },
                 },
               ],

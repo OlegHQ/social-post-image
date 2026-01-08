@@ -66,9 +66,11 @@ export function createParagraphQuote(options: ParagraphQuoteOptions): PosterDefi
     variant: 'title' as const,
     color: 'foreground' as const,
     style: {
-      fontWeight: '400',
-      lineHeight: '1.25',
-      ...(index > 0 ? { marginTop: `${gap * 4}px` } : {}),
+      fontSize: '52px',
+      fontWeight: '700',
+      lineHeight: '1.15',
+      letterSpacing: '-0.01em',
+      ...(index > 0 ? { marginTop: `${gap * 8}px` } : {}),
     },
   }));
 
@@ -105,7 +107,11 @@ export function createParagraphQuote(options: ParagraphQuoteOptions): PosterDefi
               content: `${authorPrefix}${author}`,
               variant: 'title',
               color: 'foreground',
-              style: { fontWeight: '400' },
+              style: {
+                fontSize: '42px',
+                fontWeight: '700',
+                marginTop: '40px',
+              },
             },
 
             // Corner text (optional)

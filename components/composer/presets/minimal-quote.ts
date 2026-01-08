@@ -105,8 +105,10 @@ export function createMinimalQuote(options: MinimalQuoteOptions): PosterDefiniti
           variant: 'title',
           color: 'foreground',
           style: {
+            fontSize: '58px',
             fontWeight: '700',
-            lineHeight: '1.2',
+            lineHeight: '1.1',
+            letterSpacing: '-0.02em',
           },
         },
 

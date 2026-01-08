@@ -72,7 +72,8 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
         style: {
           fontWeight: '700',
           lineHeight: '1',
-          fontSize: '32px',
+          fontSize: '38px',
+          letterSpacing: '-0.01em',
         },
       },
       // Explanation
@@ -155,14 +156,22 @@ export function createNumberedPrinciples(options: NumberedPrinciplesOptions): Po
               content: titleBold,
               variant: 'headline',
               color: 'foreground',
-              style: { fontWeight: '900' },
+              style: {
+                fontSize: '72px',
+                fontWeight: '900',
+                letterSpacing: '-0.02em',
+              },
             },
             {
               type: 'text',
               content: titleRegular,
               variant: 'headline',
               color: 'foreground',
-              style: { fontWeight: '300' },
+              style: {
+                fontSize: '72px',
+                fontWeight: '300',
+                letterSpacing: '-0.02em',
+              },
             },
           ],
         },

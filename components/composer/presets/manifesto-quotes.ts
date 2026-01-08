@@ -46,9 +46,9 @@ export function createManifestoQuotes(options: ManifestoQuotesOptions): PosterDe
       variant: statementVariant,
       color: 'foreground' as const,
       style: {
-        ...(statementVariant === 'hero' ? { fontSize: '90px' } : {}),
+        fontSize: '130px',
         fontWeight: '900',
-        lineHeight: '0.95',
+        lineHeight: '0.92',
         letterSpacing: '-0.03em',
       },
     }));

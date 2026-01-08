@@ -94,10 +94,10 @@ export function createSplitWord(options: SplitWordOptions): PosterDefinition {
           variant: 'hero',
           color: wordColor,
           style: {
-            fontSize: '160px',
+            fontSize: '220px',
             fontWeight: '900',
             lineHeight: '0.85',
-            letterSpacing: '-0.04em',
+            letterSpacing: '-0.03em',
           },
         },
 
@@ -108,10 +108,10 @@ export function createSplitWord(options: SplitWordOptions): PosterDefinition {
           variant: 'hero',
           color: wordColor,
           style: {
-            fontSize: '160px',
+            fontSize: '220px',
             fontWeight: '900',
             lineHeight: '0.85',
-            letterSpacing: '-0.04em',
+            letterSpacing: '-0.03em',
           },
         },
 
@@ -125,8 +125,9 @@ export function createSplitWord(options: SplitWordOptions): PosterDefinition {
               variant: 'title' as const,
               color: 'foreground' as const,
               style: {
-                fontWeight: '400',
-                lineHeight: '1.2',
+                fontSize: '48px',
+                fontWeight: '700',
+                lineHeight: '1.15',
               },
             }]
           : []),

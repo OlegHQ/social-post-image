@@ -148,6 +148,7 @@ export function createVignelliEnhanced(options: VignelliEnhancedOptions): Poster
           color: 'foreground',
           italic: quoteItalic,
           style: {
+            fontSize: '42px',
             lineHeight: '1.15',
             fontWeight: quoteItalic ? '400' : '700',
           },
@@ -160,6 +161,7 @@ export function createVignelliEnhanced(options: VignelliEnhancedOptions): Poster
           variant: emphasisVariant,
           color: 'accent',
           style: {
+            fontSize: '85px',
             lineHeight: '0.95',
             fontWeight: '900',
             letterSpacing: '-0.02em',

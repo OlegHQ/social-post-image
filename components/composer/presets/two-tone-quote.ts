@@ -39,8 +39,9 @@ function buildQuoteLine(
       style: {
         display: 'inline',
         fontWeight: '900',
-        fontSize: '72px',
-        lineHeight: '1.0',
+        fontSize: '95px',
+        lineHeight: '1.05',
+        letterSpacing: '-0.02em',
       },
     };
   });
