@@ -94,6 +94,8 @@ export function Canvas({
       <div
         className="swiss-canvas"
         data-theme={resolvedTheme.id}
+        data-width={width}
+        data-height={height}
         style={canvasStyle}
       >
         {children}

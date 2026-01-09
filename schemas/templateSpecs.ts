@@ -1032,11 +1032,11 @@ export const templateSpecs: Record<string, TemplateSpec> = {
     linkedInContext: 'Use when sharing wisdom that requires multiple sentences. The paragraph structure maintains readability while looking sophisticated.',
     fieldGuides: {
       paragraphs: {
-        description: 'Array of paragraph texts.',
+        description: 'Array of SHORT paragraph texts. CRITICAL: Each paragraph must be 40-80 characters max (1-2 short sentences). Total text must not exceed 250 characters or it will overflow.',
         examples: [
-          '["The grid system is an aid, not a guarantee.", "It permits a number of possible uses.", "One must learn how to use the grid."]',
+          '["The grid is an aid, not a guarantee.", "It permits many possible uses.", "One must learn to use it well."]',
         ],
-        tips: 'Use 2-4 paragraphs. Each should be a complete thought.',
+        tips: 'Use 2-3 SHORT paragraphs. Each paragraph: 40-80 characters (1-2 brief sentences). Total under 250 characters. DO NOT write long paragraphs.',
         required: true,
         type: 'array',
       },
@@ -1084,8 +1084,8 @@ export const templateSpecs: Record<string, TemplateSpec> = {
     exampleConfig: {
       paragraphs: [
         'The grid system is an aid, not a guarantee.',
-        'It permits a number of possible uses and each designer can look for a solution appropriate to his personal style.',
-        'But one must learn how to use the grid; it is an art that requires practice.',
+        'It permits many possible uses for each designer.',
+        'One must learn to use it; it requires practice.',
       ],
       paragraphGap: 'medium',
       author: 'Josef Müller-Brockmann',
@@ -1093,9 +1093,11 @@ export const templateSpecs: Record<string, TemplateSpec> = {
       theme: 'swiss-red-inverted',
     },
     designNotes: [
-      'Each paragraph should be a distinct thought',
+      'CRITICAL: Keep each paragraph to 40-80 characters (1-2 short sentences)',
+      'Total text must not exceed 250 characters or it will overflow the poster',
+      'Use 2-3 paragraphs, not 4 - less is more',
+      'Each paragraph should be a distinct, concise thought',
       'The red inverted theme is classic Müller-Brockmann',
-      'Keep paragraphs similar in length for visual balance',
     ],
   },
 
@@ -1116,26 +1118,26 @@ export const templateSpecs: Record<string, TemplateSpec> = {
     linkedInContext: 'Use when you want maximum visual impact with a single word or concept. The split creates drama and memorability.',
     fieldGuides: {
       url: {
-        description: 'URL text displayed at top.',
+        description: 'Optional URL text displayed at top.',
         maxChars: 40,
         required: false,
         type: 'string',
       },
       wordPart1: {
-        description: 'First part of the split word.',
+        description: 'REQUIRED: First part of the split word. Extract a powerful concept word from the post and split it creatively.',
         minChars: 2,
         maxChars: 10,
-        examples: ['For', 'To', 'Be'],
-        tips: 'Usually 2-4 characters.',
+        examples: ['For', 'To', 'Be', 'Cre', 'Trans'],
+        tips: 'Usually 2-4 characters. Pick a strong concept word and split it: Forever→For/ever, Together→To/gether, Creative→Cre/ative',
         required: true,
         type: 'string',
       },
       wordPart2: {
-        description: 'Second part of the split word.',
+        description: 'REQUIRED: Second part of the split word. Must complete the word started in wordPart1.',
         minChars: 2,
         maxChars: 10,
-        examples: ['ever.', 'gether.', 'yond.'],
-        tips: 'Include punctuation if desired.',
+        examples: ['ever.', 'gether.', 'yond.', 'ative.', 'form.'],
+        tips: 'Include period at end. This completes wordPart1 to form a full word.',
         required: true,
         type: 'string',
       },
@@ -1147,18 +1149,20 @@ export const templateSpecs: Record<string, TemplateSpec> = {
         type: 'string',
       },
       supportingQuote: {
-        description: 'Quote below the split word.',
+        description: 'A supporting quote or statement from the post that relates to the split word.',
         maxChars: 80,
-        examples: ['If you do it right, it will last forever.'],
+        examples: ['If you do it right, it will last forever.', 'Great teams work together.'],
+        tips: 'Extract a relevant quote from the post that supports the concept in the split word.',
         required: false,
         type: 'string',
       },
       bioColumns: {
-        description: 'Footer bio columns (max 3).',
+        description: 'Footer bio columns with author info (max 3 columns).',
         type: 'array',
         examples: [
-          '[{ "primary": "Massimo Vignelli", "secondary": "1931-2014" }]',
+          '[{ "primary": "Author Name", "secondary": "Title" }]',
         ],
+        tips: 'Use for author attribution. Each column has primary (bold), secondary, and optional tertiary text.',
         required: false,
       },
       theme: {
@@ -1183,6 +1187,9 @@ export const templateSpecs: Record<string, TemplateSpec> = {
       theme: 'monochrome',
     },
     designNotes: [
+      'CRITICAL: wordPart1 + wordPart2 must form a complete word (e.g., "For" + "ever." = "Forever")',
+      'Pick a powerful concept word from the post content and split it creatively',
+      'Good split examples: Forever, Together, Transform, Creative, Beyond, Inspire',
       'The word split should create natural reading rhythm',
       'Red accent on monochrome creates the classic Vignelli look',
       'The supporting quote adds context without competing',

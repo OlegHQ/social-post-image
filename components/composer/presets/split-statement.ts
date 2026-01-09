@@ -43,6 +43,7 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
       const isLastLine = index === topLines.length - 1;
 
       // For the last line, add inline word if provided
+      // Note: Using 'background' color for text inside accent-colored card for contrast
       if (isLastLine && topInlineWord) {
         lineNodes.push({
           type: 'stack',
@@ -54,7 +55,7 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
               type: 'text',
               content: line,
               variant: 'headline',
-              color: 'foreground',
+              color: 'background',
               style: {
                 fontSize: '85px',
                 fontWeight: '700',
@@ -66,7 +67,7 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
               type: 'text',
               content: topInlineWord,
               variant: 'body',
-              color: 'foreground',
+              color: 'background',
               style: {
                 fontSize: '24px',
                 fontWeight: '400',
@@ -81,7 +82,7 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
           type: 'text',
           content: line,
           variant: 'headline',
-          color: 'foreground',
+          color: 'background',
           style: {
             fontSize: '85px',
             fontWeight: '700',
@@ -143,7 +144,7 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
                   type: 'text',
                   content: bottomWord,
                   variant: 'headline',
-                  color: 'foreground',
+                  color: 'background',
                   style: {
                     fontSize: '110px',
                     fontWeight: '700',
@@ -169,7 +170,7 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
                       type: 'text' as const,
                       content: brandName,
                       variant: 'body' as const,
-                      color: 'foreground' as const,
+                      color: 'background' as const,
                       style: { fontWeight: '700' },
                     }]
                   : [{ type: 'spacer' as const, size: 1 as const }]),
@@ -180,7 +181,7 @@ export function createSplitStatement(options: SplitStatementOptions): PosterDefi
                       type: 'text' as const,
                       content: url,
                       variant: 'meta' as const,
-                      color: 'foreground' as const,
+                      color: 'background' as const,
                       italic: true,
                     }]
                   : []),

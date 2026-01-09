@@ -8,6 +8,10 @@ import {
   getTemplateIds,
 } from '@/schemas/templateSpecs';
 
+// Rate limiting delay between API calls (Groq free tier: 8000 TPM)
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const RATE_LIMIT_DELAY_MS = 5000; // 5 seconds between calls to stay within Groq's rate limits
+
 interface GenerateRequest {
   postText: string;
   selectedTemplates: string[];
@@ -226,6 +230,11 @@ export async function POST(request: NextRequest) {
             errors.push(`${templateId}: ${errorMsg}`);
             console.error(`Error generating ${templateId}:`, templateError);
             // Continue with other templates
+          }
+
+          // Rate limiting: wait before next API call to avoid hitting Groq's TPM limit
+          if (i < selectedTemplates.length - 1) {
+            await delay(RATE_LIMIT_DELAY_MS);
           }
         }
 
