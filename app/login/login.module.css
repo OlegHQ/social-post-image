@@ -3,15 +3,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0a0a0a;
+  background: var(--ui-bg-primary);
   padding: 20px;
 }
 
 .card {
   width: 100%;
   max-width: 360px;
-  background: #1a1a1a;
-  border: 1px solid #333;
+  background: var(--ui-bg-secondary);
+  border: 1px solid var(--ui-border);
   padding: 40px;
 }
 
@@ -24,13 +24,13 @@
   font-size: 36px;
   font-weight: 900;
   letter-spacing: -0.02em;
-  color: #ff0000;
+  color: var(--ui-accent);
   margin: 0 0 8px 0;
 }
 
 .tagline {
   font-size: 12px;
-  color: #888;
+  color: var(--ui-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
@@ -53,7 +53,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #888;
+  color: var(--ui-text-muted);
 }
 
 .input {
@@ -61,24 +61,24 @@
   padding: 12px 14px;
   font-size: 14px;
   font-family: inherit;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border-strong);
   border-radius: 0;
-  color: #fff;
+  color: var(--ui-text-primary);
   transition: border-color 0.15s ease;
 }
 
 .input:focus {
   outline: none;
-  border-color: #ff0000;
+  border-color: var(--ui-accent);
 }
 
 .input::placeholder {
-  color: #666;
+  color: var(--ui-text-secondary);
 }
 
 .error {
-  color: #ff0000;
+  color: var(--ui-accent);
   font-size: 13px;
   margin: 0;
 }
@@ -89,7 +89,7 @@
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
-  background: #ff0000;
+  background: var(--ui-accent);
   border: none;
   border-radius: 0;
   color: #fff;
@@ -98,7 +98,7 @@
 }
 
 .button:hover:not(:disabled) {
-  background: #cc0000;
+  background: var(--ui-accent-hover);
 }
 
 .button:disabled {

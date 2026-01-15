@@ -2,8 +2,8 @@
 
 .editor {
   padding: 0;
-  background: #222;
-  border: 1px solid #333;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border);
   overflow: hidden;
 }
 
@@ -13,10 +13,10 @@
   justify-content: space-between;
   width: 100%;
   padding: 12px 16px;
-  background: #222;
+  background: var(--ui-bg-tertiary);
   border: none;
-  border-bottom: 1px solid #333;
-  color: #fff;
+  border-bottom: 1px solid var(--ui-border);
+  color: var(--ui-text-primary);
   cursor: pointer;
   text-align: left;
   font-family: inherit;
@@ -24,7 +24,7 @@
 }
 
 .header:hover {
-  background: #2a2a2a;
+  background: var(--ui-bg-hover);
 }
 
 .headerContent {
@@ -36,18 +36,18 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #888;
+  color: var(--ui-text-muted);
   margin: 0 0 4px 0;
 }
 
 .description {
   font-size: 12px;
-  color: #666;
+  color: var(--ui-text-secondary);
   margin: 0;
 }
 
 .expandIcon {
-  color: #666;
+  color: var(--ui-text-secondary);
   font-size: 18px;
   font-weight: 300;
   margin-left: 12px;
@@ -56,7 +56,7 @@
 .emptyState {
   padding: 24px;
   text-align: center;
-  color: #888;
+  color: var(--ui-text-muted);
   font-size: 13px;
 }
 
@@ -79,11 +79,11 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #aaa;
+  color: var(--ui-text-secondary);
 }
 
 .required {
-  color: #ff0000;
+  color: var(--ui-accent);
   margin-left: 2px;
 }
 
@@ -92,20 +92,20 @@
   padding: 10px 12px;
   font-size: 13px;
   font-family: inherit;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border-strong);
   border-radius: 0;
-  color: #fff;
+  color: var(--ui-text-primary);
   transition: border-color 0.15s ease;
 }
 
 .input:focus {
   outline: none;
-  border-color: #ff0000;
+  border-color: var(--ui-accent);
 }
 
 .input::placeholder {
-  color: #666;
+  color: var(--ui-text-secondary);
 }
 
 .textarea {
@@ -116,7 +116,7 @@
 
 .helpText {
   font-size: 11px;
-  color: #666;
+  color: var(--ui-text-secondary);
   line-height: 1.4;
 }
 
@@ -131,8 +131,8 @@
   width: 36px;
   height: 20px;
   padding: 0;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border-strong);
   border-radius: 10px;
   cursor: pointer;
   position: relative;
@@ -152,14 +152,14 @@
   left: 2px;
   width: 14px;
   height: 14px;
-  background: #666;
+  background: var(--ui-text-secondary);
   border-radius: 50%;
   transition: all 0.15s ease;
 }
 
 .toggleActive {
-  background: #ff0000;
-  border-color: #ff0000;
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
 }
 
 .toggleActive .toggleThumb {
@@ -169,7 +169,7 @@
 
 .toggleLabel {
   font-size: 13px;
-  color: #fff;
+  color: var(--ui-text-primary);
   cursor: pointer;
 }
 
@@ -186,8 +186,8 @@
   align-items: flex-start;
   gap: 8px;
   padding: 10px;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border-strong);
 }
 
 .arrayItemFields {
@@ -214,9 +214,9 @@
   height: 24px;
   padding: 0;
   background: transparent;
-  border: 1px solid #444;
+  border: 1px solid var(--ui-border-strong);
   border-radius: 0;
-  color: #666;
+  color: var(--ui-text-secondary);
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
@@ -224,8 +224,8 @@
 }
 
 .removeButton:hover {
-  background: #ff0000;
-  border-color: #ff0000;
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
   color: white;
 }
 
@@ -233,9 +233,9 @@
   width: 100%;
   padding: 10px;
   background: transparent;
-  border: 1px dashed #444;
+  border: 1px dashed var(--ui-border-strong);
   border-radius: 0;
-  color: #666;
+  color: var(--ui-text-secondary);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -243,8 +243,8 @@
 }
 
 .addButton:hover {
-  border-color: #ff0000;
-  color: #ff0000;
+  border-color: var(--ui-accent);
+  color: var(--ui-accent);
 }
 
 /* Object field styles */
@@ -253,8 +253,8 @@
   flex-direction: column;
   gap: 10px;
   padding: 12px;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border-strong);
 }
 
 .objectProperty {
