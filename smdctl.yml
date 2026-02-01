@@ -1,0 +1,21 @@
+name: swiss-content-generator
+description: Swiss Content Generator (Next.js)
+command: /home/snowbear/.nix-profile/bin/bun
+args:
+  - run
+  - start
+  - --
+  - -p
+  - "38123"
+  - -H
+  - "0.0.0.0"
+workdir: /home/snowbear/projects/social-post-image
+environment:
+  NODE_ENV: production
+  NEXT_TELEMETRY_DISABLED: "1"
+  AUTH_PASSWORD: ${AUTH_PASSWORD}
+  AUTH_SECRET: ${AUTH_SECRET}
+  MONGODB_URI: ${MONGODB_URI}
+  LLM_API_KEY: ${LLM_API_KEY}
+restart: always
+timeout_start: 60
