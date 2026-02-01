@@ -22,6 +22,7 @@ export function SeriesNumber({
   padZero = true,
   className,
   style,
+  dataNodeId,
 }: SeriesNumberProps) {
   // Format number - pad with zero if needed
   const displayNumber =
@@ -45,7 +46,7 @@ export function SeriesNumber({
   };
 
   return (
-    <div className={clsx('swiss-series-number', className)} style={computedStyle}>
+    <div className={clsx('swiss-series-number', className)} style={computedStyle} data-node-id={dataNodeId}>
       {displayNumber}
     </div>
   );

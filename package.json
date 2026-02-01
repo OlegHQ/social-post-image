@@ -9,21 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "clsx": "^2.0.0",
+    "html-to-image": "^1.11.11",
+    "mongodb": "^7.0.0",
     "next": "^14.2.0",
+    "next-auth": "5.0.0-beta.25",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "next-auth": "5.0.0-beta.25",
-    "html-to-image": "^1.11.11",
-    "zod": "^3.22.0",
-    "clsx": "^2.0.0"
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
-    "typescript": "^5.3.3",
     "eslint": "^8.56.0",
-    "eslint-config-next": "^14.2.0"
+    "eslint-config-next": "^14.2.0",
+    "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=18.0.0"

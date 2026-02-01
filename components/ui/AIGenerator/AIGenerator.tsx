@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { useDesign } from '@/context/DesignContext';
 import { getTemplateIds, templateSpecs } from '@/schemas/templateSpecs';
-import { presetSchemas } from '@/schemas/presetSchemas';
 import type { ThemePreset } from '@/lib/types';
 import styles from './AIGenerator.module.css';
 
@@ -15,12 +14,6 @@ interface GenerateResult {
 }
 
 type GeneratorState = 'idle' | 'loading' | 'success' | 'error';
-
-interface SavedState {
-  activePreset: string | null;
-  presetOptions: Record<string, unknown>;
-  theme: ThemePreset;
-}
 
 const ALL_TEMPLATES = getTemplateIds();
 
@@ -60,54 +53,8 @@ export function AIGenerator() {
   const [progressMessage, setProgressMessage] = useState<string>('');
 
   const abortControllerRef = useRef<AbortController | null>(null);
-  const savedStateRef = useRef<SavedState | null>(null);
-  const isPreviewingRef = useRef(false);
 
-  const { state: designState, setPreset, updatePresetOptions, setTheme } = useDesign();
-
-  // Handle hover preview - show template's default example in main canvas
-  const handleTemplateHover = useCallback((templateId: string) => {
-    // Don't preview during loading
-    if (generatorState === 'loading') return;
-
-    // Save current state if not already previewing
-    if (!isPreviewingRef.current) {
-      savedStateRef.current = {
-        activePreset: designState.activePreset,
-        presetOptions: { ...designState.presetOptions },
-        theme: (designState.definition?.theme?.preset || 'swiss-red') as ThemePreset,
-      };
-      isPreviewingRef.current = true;
-    }
-
-    // Get the template's default config and theme
-    const templateSpec = templateSpecs[templateId];
-    const presetSchema = presetSchemas[templateId];
-
-    if (presetSchema) {
-      const defaultOptions = presetSchema.defaultOptions;
-      const defaultTheme = (templateSpec?.exampleConfig?.theme || defaultOptions.theme || 'swiss-red') as ThemePreset;
-
-      // Temporarily show the preview
-      setPreset(templateId, defaultOptions);
-      setTheme(defaultTheme);
-    }
-  }, [generatorState, designState.activePreset, designState.presetOptions, designState.definition?.theme?.preset, setPreset, setTheme]);
-
-  const handleTemplateLeave = useCallback(() => {
-    // Restore saved state
-    if (isPreviewingRef.current && savedStateRef.current) {
-      const { activePreset, presetOptions, theme } = savedStateRef.current;
-
-      if (activePreset) {
-        setPreset(activePreset, presetOptions);
-        setTheme(theme);
-      }
-
-      savedStateRef.current = null;
-      isPreviewingRef.current = false;
-    }
-  }, [setPreset, setTheme]);
+  const { applyAIVariantAsDesign } = useDesign();
 
   const toggleTemplate = (templateId: string) => {
     setSelectedTemplates((prev) =>
@@ -268,10 +215,13 @@ export function AIGenerator() {
 
     setSelectedIndex(index);
 
-    // Apply to design context
-    setPreset(variant.templateId);
-    updatePresetOptions(variant.config);
-    setTheme(variant.theme as ThemePreset);
+    // Create a new design (Figma/Canva-like) instead of overwriting the current one.
+    applyAIVariantAsDesign(
+      variant.templateId,
+      variant.config,
+      variant.theme as ThemePreset,
+      variant.reasoning
+    );
   };
 
   const handleClear = () => {
@@ -324,7 +274,6 @@ export function AIGenerator() {
             </div>
             <div
               className={styles.templateGrid}
-              onMouseLeave={handleTemplateLeave}
             >
               {ALL_TEMPLATES.map((templateId) => (
                 <button
@@ -332,7 +281,6 @@ export function AIGenerator() {
                   type="button"
                   className={`${styles.templateChip} ${selectedTemplates.includes(templateId) ? styles.templateChipSelected : ''}`}
                   onClick={() => toggleTemplate(templateId)}
-                  onMouseEnter={() => handleTemplateHover(templateId)}
                   disabled={generatorState === 'loading'}
                   title={templateSpecs[templateId]?.description || ''}
                 >

@@ -74,6 +74,7 @@ export function Text({
   as: Component = 'p',
   className,
   style,
+  dataNodeId,
 }: TextProps) {
   const baseStyles = variantStyles[variant];
 
@@ -98,7 +99,11 @@ export function Text({
   };
 
   return (
-    <Component className={clsx('swiss-text', `swiss-text--${variant}`, className)} style={computedStyle}>
+    <Component
+      className={clsx('swiss-text', `swiss-text--${variant}`, className)}
+      style={computedStyle}
+      data-node-id={dataNodeId}
+    >
       {children}
     </Component>
   );

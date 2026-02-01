@@ -23,6 +23,7 @@ export function SeriesDots({
   gap = 2,
   className,
   style,
+  dataNodeId,
 }: SeriesDotsProps) {
   const dotSize = sizeMap[size];
 
@@ -52,7 +53,7 @@ export function SeriesDots({
   });
 
   return (
-    <div className={clsx('swiss-series-dots', className)} style={containerStyle}>
+    <div className={clsx('swiss-series-dots', className)} style={containerStyle} data-node-id={dataNodeId}>
       {Array.from({ length: total }, (_, i) => (
         <span
           key={i}

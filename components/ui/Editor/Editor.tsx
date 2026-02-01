@@ -8,8 +8,8 @@ import styles from './Editor.module.css';
 
 export function Editor() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { state, updatePresetOption } = useDesign();
-  const { activePreset, presetOptions } = state;
+  const { activeDesign, updatePresetOption } = useDesign();
+  const { activePreset, presetOptions } = activeDesign;
 
   if (!activePreset) {
     return (

@@ -7,6 +7,71 @@
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MODEL = 'openai/gpt-oss-120b';
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function isRetryableStatus(status: number) {
+  return status === 429 || status === 503 || status === 502 || status === 504;
+}
+
+function jitter(ms: number) {
+  const factor = 0.2;
+  const delta = ms * factor * (Math.random() * 2 - 1);
+  return Math.max(0, Math.floor(ms + delta));
+}
+
+function parseRetryAfterMs(headers: Headers): number | null {
+  const ra = headers.get('retry-after');
+  if (!ra) return null;
+  const asNum = Number(ra);
+  if (Number.isFinite(asNum)) return Math.max(0, Math.floor(asNum * 1000));
+  const asDate = Date.parse(ra);
+  if (!Number.isFinite(asDate)) return null;
+  return Math.max(0, asDate - Date.now());
+}
+
+async function fetchWithBackoff(
+  input: RequestInfo,
+  init: RequestInit,
+  opts?: {
+    maxAttempts?: number;
+    baseDelayMs?: number;
+    maxDelayMs?: number;
+    onRetry?: (info: { attempt: number; delayMs: number; status?: number; message: string }) => void;
+  }
+): Promise<Response> {
+  const maxAttempts = opts?.maxAttempts ?? 6;
+  const baseDelayMs = opts?.baseDelayMs ?? 800;
+  const maxDelayMs = opts?.maxDelayMs ?? 12000;
+
+  let attempt = 0;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    attempt += 1;
+    const res = await fetch(input, init);
+    if (res.ok) return res;
+
+    const retryAfter = parseRetryAfterMs(res.headers);
+    const isRetryable = isRetryableStatus(res.status);
+
+    let message = res.statusText;
+    try {
+      const errorData = await res.clone().json();
+      message = errorData?.error?.message || errorData?.message || message;
+    } catch {
+      // ignore
+    }
+
+    if (!isRetryable || attempt >= maxAttempts) {
+      throw new Error(`Groq API error (${res.status}): ${message}`);
+    }
+
+    const exp = Math.min(maxDelayMs, Math.floor(baseDelayMs * 2 ** (attempt - 1)));
+    const delayMs = jitter(retryAfter ?? exp);
+    opts?.onRetry?.({ attempt, delayMs, status: res.status, message });
+    await sleep(delayMs);
+  }
+}
+
 interface ChatMessage {
 	role: 'system' | 'user' | 'assistant';
 	content: string;
@@ -50,7 +115,9 @@ export async function callOpenRouter(
 		{ role: 'user', content: userPrompt },
 	];
 
-	const response = await fetch(GROQ_API_URL, {
+	const response = await fetchWithBackoff(
+		GROQ_API_URL,
+		{
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${apiKey}`,
@@ -62,7 +129,9 @@ export async function callOpenRouter(
 			max_tokens: 4000,
 			temperature: 0.4,
 		}),
-	});
+		},
+		{ maxAttempts: 6 }
+	);
 
 	if (!response.ok) {
 		const errorData = await response.json().catch(() => ({}));
@@ -102,7 +171,9 @@ export async function* streamOpenRouter(
 		{ role: 'user', content: userPrompt },
 	];
 
-	const response = await fetch(GROQ_API_URL, {
+	const response = await fetchWithBackoff(
+		GROQ_API_URL,
+		{
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${apiKey}`,
@@ -115,7 +186,9 @@ export async function* streamOpenRouter(
 			temperature: 0.4,
 			stream: true,
 		}),
-	});
+		},
+		{ maxAttempts: 6 }
+	);
 
 	if (!response.ok) {
 		const errorData = await response.json().catch(() => ({}));
@@ -158,6 +231,37 @@ export async function* streamOpenRouter(
 		}
 	} finally {
 		reader.releaseLock();
+	}
+}
+
+export async function* streamOpenRouterWithRetry(
+	systemPrompt: string,
+	userPrompt: string,
+	opts?: {
+		maxAttempts?: number;
+		onRetry?: (info: { attempt: number; delayMs: number; message: string }) => void;
+	}
+): AsyncGenerator<string, void, unknown> {
+	const maxAttempts = opts?.maxAttempts ?? 6;
+	let attempt = 0;
+
+	while (attempt < maxAttempts) {
+		attempt += 1;
+		try {
+			for await (const chunk of streamOpenRouter(systemPrompt, userPrompt)) {
+				yield chunk;
+			}
+			return;
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : 'Unknown error';
+			const looksRateLimited = msg.includes('(429)') || msg.toLowerCase().includes('rate');
+			if (!looksRateLimited || attempt >= maxAttempts) {
+				throw e;
+			}
+			const delayMs = jitter(Math.min(12000, 800 * 2 ** (attempt - 1)));
+			opts?.onRetry?.({ attempt, delayMs, message: msg });
+			await sleep(delayMs);
+		}
 	}
 }
 
@@ -270,4 +374,3 @@ export function parseLLMVariants(content: string): GenerateResult[] {
 		);
 	}
 }
-

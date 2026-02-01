@@ -33,6 +33,7 @@ export function Stack({
   flex,
   className,
   style,
+  dataNodeId,
 }: StackProps) {
   const computedStyle: React.CSSProperties = {
     display: 'flex',
@@ -46,7 +47,11 @@ export function Stack({
   };
 
   return (
-    <div className={clsx('swiss-stack', `swiss-stack--${direction}`, className)} style={computedStyle}>
+    <div
+      className={clsx('swiss-stack', `swiss-stack--${direction}`, className)}
+      style={computedStyle}
+      data-node-id={dataNodeId}
+    >
       {children}
     </div>
   );

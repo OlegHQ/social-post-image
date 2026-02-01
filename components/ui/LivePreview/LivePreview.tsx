@@ -7,9 +7,19 @@ import { useExport } from '@/hooks/useExport';
 import styles from './LivePreview.module.css';
 
 export function LivePreview() {
-  const { state, toggleGrid, setPreviewScale } = useDesign();
+  const {
+    state,
+    activeDesign,
+    displayedDefinition,
+    toggleGrid,
+    setPreviewScale,
+    selectNode,
+    nudgeNode,
+  } = useDesign();
   const { exportImage, isExporting } = useExport();
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  const dragRef = useRef<{ nodeId: string; startX: number; startY: number } | null>(null);
 
   const handleExport = async () => {
     if (canvasRef.current) {
@@ -18,9 +28,47 @@ export function LivePreview() {
         await exportImage(canvasElement, {
           format: 'png',
           scale: 2,
-          filename: state.definition.name || 'swiss-poster',
+          filename: displayedDefinition.name || 'swiss-poster',
         });
       }
+    }
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (state.previewDefinition) return;
+    const target = e.target as HTMLElement | null;
+    const el = target?.closest?.('[data-node-id]') as HTMLElement | null;
+    const nodeId = el?.dataset?.nodeId;
+    if (!nodeId) {
+      selectNode(null);
+      return;
+    }
+
+    selectNode(nodeId);
+    dragRef.current = { nodeId, startX: e.clientX, startY: e.clientY };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragRef.current) return;
+    if (activeDesign.selectedNodeId !== dragRef.current.nodeId) return;
+
+    const dx = e.clientX - dragRef.current.startX;
+    const dy = e.clientY - dragRef.current.startY;
+    if (dx === 0 && dy === 0) return;
+
+    dragRef.current.startX = e.clientX;
+    dragRef.current.startY = e.clientY;
+    nudgeNode(dragRef.current.nodeId, dx, dy);
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!dragRef.current) return;
+    dragRef.current = null;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
     }
   };
 
@@ -58,9 +106,23 @@ export function LivePreview() {
       </div>
 
       <div className={styles.canvasContainer}>
-        <div ref={canvasRef} className={styles.canvasWrapper}>
+        <div
+          ref={canvasRef}
+          className={styles.canvasWrapper}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+        >
+          {activeDesign.selectedNodeId && (
+            <style>{`
+              [data-node-id="${activeDesign.selectedNodeId.replace(/"/g, '\\"')}"] {
+                outline: 2px solid rgba(255, 0, 0, 0.9);
+                outline-offset: 2px;
+              }
+            `}</style>
+          )}
           <LayoutRenderer
-            definition={state.definition}
+            definition={displayedDefinition}
             showGrid={state.showGrid}
             scale={state.previewScale}
           />

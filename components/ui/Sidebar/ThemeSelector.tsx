@@ -5,8 +5,8 @@ import { useDesign } from '@/context/DesignContext';
 import styles from './Sidebar.module.css';
 
 export function ThemeSelector() {
-  const { state, setTheme } = useDesign();
-  const currentTheme = state.definition.theme.preset || 'swiss-red';
+  const { activeDesign, setTheme } = useDesign();
+  const currentTheme = activeDesign.definition.theme.preset || 'swiss-red';
 
   return (
     <div className={styles.section}>

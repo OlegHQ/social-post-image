@@ -23,6 +23,7 @@ import type {
   SeriesDotsNode,
   HeaderNode,
   FooterNode,
+  ImageNode,
 } from '@/lib/types';
 import { Canvas } from './Canvas';
 
@@ -101,6 +102,7 @@ function NodeRenderer({ node }: NodeRendererProps) {
 function TextRenderer({ node }: { node: TextNode }) {
   return (
     <Text
+      dataNodeId={node.id}
       variant={node.variant}
       color={node.color}
       uppercase={node.uppercase}
@@ -117,6 +119,7 @@ function TextRenderer({ node }: { node: TextNode }) {
 function BoxRenderer({ node }: { node: BoxNode }) {
   return (
     <Box
+      dataNodeId={node.id}
       color={node.color}
       padding={node.padding}
       paddingX={node.paddingX}
@@ -139,6 +142,7 @@ function BoxRenderer({ node }: { node: BoxNode }) {
 function StackRenderer({ node }: { node: StackNode }) {
   return (
     <Stack
+      dataNodeId={node.id}
       direction={node.direction}
       gap={node.gap}
       align={node.align}
@@ -157,6 +161,7 @@ function StackRenderer({ node }: { node: StackNode }) {
 function GridRenderer({ node }: { node: GridNode }) {
   return (
     <Grid
+      dataNodeId={node.id}
       columns={node.columns}
       rows={node.rows}
       gap={node.gap}
@@ -183,6 +188,7 @@ function GridRenderer({ node }: { node: GridNode }) {
 function DividerRenderer({ node }: { node: DividerNode }) {
   return (
     <Divider
+      dataNodeId={node.id}
       color={node.color}
       thickness={node.thickness}
       margin={node.margin}
@@ -194,6 +200,7 @@ function DividerRenderer({ node }: { node: DividerNode }) {
 function SpacerRenderer({ node }: { node: SpacerNode }) {
   return (
     <Spacer
+      dataNodeId={node.id}
       size={node.size}
       direction={node.direction}
       style={node.style as React.CSSProperties}
@@ -204,6 +211,7 @@ function SpacerRenderer({ node }: { node: SpacerNode }) {
 function SeriesNumberRenderer({ node }: { node: SeriesNumberNode }) {
   return (
     <SeriesNumber
+      dataNodeId={node.id}
       number={node.number}
       size={node.size}
       color={node.color}
@@ -216,6 +224,7 @@ function SeriesNumberRenderer({ node }: { node: SeriesNumberNode }) {
 function SeriesDotsRenderer({ node }: { node: SeriesDotsNode }) {
   return (
     <SeriesDots
+      dataNodeId={node.id}
       filled={node.filled}
       total={node.total}
       color={node.color}
@@ -232,7 +241,7 @@ function SeriesDotsRenderer({ node }: { node: SeriesDotsNode }) {
  */
 function HeaderRenderer({ node }: { node: HeaderNode }) {
   return (
-    <Stack direction="vertical" gap={4}>
+    <Stack dataNodeId={node.id} direction="vertical" gap={4}>
       {(node.title || node.subtitle) && (
         <Stack direction="horizontal" gap={2} align="center">
           {node.title && (
@@ -268,7 +277,7 @@ function FooterRenderer({ node }: { node: FooterNode }) {
   const dots = node.dotsConfig || { filled: 3, total: 5 };
 
   return (
-    <Stack direction="vertical" gap={4}>
+    <Stack dataNodeId={node.id} direction="vertical" gap={4}>
       <Divider />
       <Stack direction="horizontal" justify="between" align="end">
         <Stack direction="horizontal" gap={8}>
@@ -309,11 +318,12 @@ function FooterRenderer({ node }: { node: FooterNode }) {
 /**
  * Image renderer
  */
-function ImageRenderer({ node }: { node: { src: string; alt?: string; fit?: string; width?: string; height?: string; style?: Record<string, string | number> } }) {
+function ImageRenderer({ node }: { node: ImageNode }) {
   return (
     <img
       src={node.src}
       alt={node.alt || ''}
+      data-node-id={node.id}
       style={{
         objectFit: (node.fit as React.CSSProperties['objectFit']) || 'cover',
         width: node.width || '100%',

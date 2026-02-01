@@ -13,8 +13,8 @@ const canvasOptions: Array<{ id: CanvasPreset; name: string; dimensions: string 
 ];
 
 export function CanvasSelector() {
-  const { state, setCanvas } = useDesign();
-  const currentCanvas = state.definition.canvas.preset || 'linkedin-portrait';
+  const { activeDesign, setCanvas } = useDesign();
+  const currentCanvas = activeDesign.definition.canvas.preset || 'linkedin-portrait';
 
   return (
     <div className={styles.section}>

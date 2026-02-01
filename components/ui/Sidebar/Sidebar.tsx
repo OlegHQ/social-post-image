@@ -1,6 +1,9 @@
 'use client';
 
 import { PresetSelector } from './PresetSelector';
+import { DesignsPanel } from './DesignsPanel';
+import { LayersPanel } from './LayersPanel';
+import { Inspector } from '../Inspector';
 import { ThemeSelector } from './ThemeSelector';
 import { CanvasSelector } from './CanvasSelector';
 import { Editor } from '../Editor';
@@ -17,6 +20,11 @@ export function Sidebar() {
 
       <div className={styles.content}>
         <AIGenerator />
+        <DesignsPanel />
+        <LayersPanel />
+        <div className={styles.section}>
+          <Inspector />
+        </div>
         <PresetSelector />
         <div className={styles.section}>
           <Editor />

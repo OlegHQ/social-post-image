@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { streamOpenRouter, parseLLMResponse } from '@/lib/openrouter';
+import { streamOpenRouterWithRetry, parseLLMResponse } from '@/lib/openrouter';
 import {
   templateSpecs,
   themeReference,
@@ -202,7 +202,17 @@ export async function POST(request: NextRequest) {
 
             // Stream LLM response for this template
             let fullContent = '';
-            for await (const chunk of streamOpenRouter(systemPrompt, userPrompt)) {
+            for await (const chunk of streamOpenRouterWithRetry(systemPrompt, userPrompt, {
+              maxAttempts: 6,
+              onRetry: ({ attempt, delayMs, message }) => {
+                sendEvent('progress', {
+                  message: `Rate limited for ${templateId}. Retrying in ${Math.ceil(delayMs / 100) / 10}s (attempt ${attempt}/6)...`,
+                  current: i + 1,
+                  total: selectedTemplates.length,
+                  detail: message,
+                });
+              },
+            })) {
               fullContent += chunk;
             }
 

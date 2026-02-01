@@ -5,8 +5,8 @@ import { presetSchemas } from '@/schemas/presetSchemas';
 import styles from './Sidebar.module.css';
 
 export function PresetSelector() {
-  const { state, setPreset } = useDesign();
-  const { activePreset } = state;
+  const { activeDesign, addDesignFromPreset } = useDesign();
+  const { activePreset } = activeDesign;
 
   return (
     <div className={styles.section}>
@@ -16,7 +16,7 @@ export function PresetSelector() {
           <button
             key={schema.id}
             className={`${styles.presetButton} ${activePreset === schema.id ? styles.presetButtonActive : ''}`}
-            onClick={() => setPreset(schema.id)}
+            onClick={() => addDesignFromPreset(schema.id)}
           >
             <span className={styles.presetName}>{schema.name}</span>
             <span className={styles.presetDescription}>{schema.description}</span>

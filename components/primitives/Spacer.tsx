@@ -12,6 +12,7 @@ export function Spacer({
   direction = 'vertical',
   className,
   style,
+  dataNodeId,
 }: SpacerProps) {
   const isFlexible = size === 'flex';
 
@@ -38,6 +39,7 @@ export function Spacer({
     <div
       className={clsx('swiss-spacer', isFlexible && 'swiss-spacer--flex', className)}
       style={computedStyle}
+      data-node-id={dataNodeId}
       aria-hidden="true"
     />
   );

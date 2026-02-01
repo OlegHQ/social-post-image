@@ -20,6 +20,7 @@ export function Divider({
   margin,
   className,
   style,
+  dataNodeId,
 }: DividerProps) {
   const computedStyle: React.CSSProperties = {
     width: '100%',
@@ -35,6 +36,6 @@ export function Divider({
   };
 
   return (
-    <hr className={clsx('swiss-divider', className)} style={computedStyle} />
+    <hr className={clsx('swiss-divider', className)} style={computedStyle} data-node-id={dataNodeId} />
   );
 }

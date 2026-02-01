@@ -17,6 +17,7 @@ export function Grid({
   areas,
   className,
   style,
+  dataNodeId,
 }: GridProps) {
   const computedStyle: React.CSSProperties = {
     display: 'grid',
@@ -33,7 +34,7 @@ export function Grid({
   };
 
   return (
-    <div className={clsx('swiss-grid', className)} style={computedStyle}>
+    <div className={clsx('swiss-grid', className)} style={computedStyle} data-node-id={dataNodeId}>
       {children}
     </div>
   );

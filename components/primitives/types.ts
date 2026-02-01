@@ -27,6 +27,8 @@ export type ColorValue = ColorToken | string;
 export interface PrimitiveProps {
   className?: string;
   style?: React.CSSProperties;
+  /** Internal node id for selection/move */
+  dataNodeId?: string;
 }
 
 // Text component props

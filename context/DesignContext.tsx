@@ -1,7 +1,18 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, type ReactNode } from 'react';
-import type { PosterDefinition, ThemePreset, CanvasPreset } from '@/lib/types';
+import React, { createContext, useContext, useEffect, useMemo, useReducer, useRef, type ReactNode } from 'react';
+import type { PosterDefinition, ThemePreset, CanvasPreset, PrimitiveNode } from '@/lib/types';
+import {
+  applyDeletions,
+  applyInsertions,
+  applyOverrides,
+  applyOrders,
+  type NodeInsertion,
+  type NodeOverride,
+  type NodeOrderMap,
+  findNodeById,
+  findParentInfo,
+} from '@/lib/design/tree';
 import {
   createStatementPoster,
   createVignelliQuote,
@@ -23,6 +34,103 @@ import {
   createSplitStatement,
 } from '@/components/composer';
 import { presetSchemas } from '@/schemas/presetSchemas';
+
+type NodeTransform = { x: number; y: number };
+
+function createId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function composeTransform(existing: unknown, translate: string): string {
+  if (typeof existing === 'string' && existing.trim()) {
+    const stripped = existing.replace(/^translate\([^)]*\)\s*/i, '').trim();
+    return stripped ? `${translate} ${stripped}` : translate;
+  }
+  return translate;
+}
+
+function withDeterministicNodeIds(node: PrimitiveNode, path: string[] = []): PrimitiveNode {
+  const id = node.id || `node:${path.join('.') || 'root'}`;
+  const base: PrimitiveNode = { ...node, id };
+
+  if (base.type === 'box') {
+    return {
+      ...base,
+      children: base.children?.map((child, i) => withDeterministicNodeIds(child, [...path, `${base.type}${i}`])),
+    };
+  }
+  if (base.type === 'stack') {
+    return {
+      ...base,
+      children: base.children.map((child, i) => withDeterministicNodeIds(child, [...path, `${base.type}${i}`])),
+    };
+  }
+  if (base.type === 'grid') {
+    return {
+      ...base,
+      children: (base.children as any[]).map((child, i) => {
+        const { column, row, area, ...rest } = child as any;
+        const nextChild = withDeterministicNodeIds(rest as PrimitiveNode, [...path, `${base.type}${i}`]);
+        return { ...nextChild, ...(column ? { column } : {}), ...(row ? { row } : {}), ...(area ? { area } : {}) };
+      }) as any,
+    };
+  }
+
+  return base;
+}
+
+function applyTransformsToNode(node: PrimitiveNode, transforms: Record<string, NodeTransform>): PrimitiveNode {
+  const t = node.id ? transforms[node.id] : undefined;
+  const existingStyle = node.style ? { ...node.style } : undefined;
+  const transformStr = t ? `translate(${t.x}px, ${t.y}px)` : undefined;
+
+  const nextStyle = transformStr
+    ? {
+        ...(existingStyle || {}),
+        transform: composeTransform(existingStyle?.transform, transformStr),
+      }
+    : existingStyle;
+
+  const next: PrimitiveNode = {
+    ...node,
+    ...(nextStyle ? { style: nextStyle } : {}),
+  };
+
+  if (next.type === 'box') {
+    return {
+      ...next,
+      children: next.children?.map((c) => applyTransformsToNode(c, transforms)),
+    };
+  }
+  if (next.type === 'stack') {
+    return {
+      ...next,
+      children: next.children.map((c) => applyTransformsToNode(c, transforms)),
+    };
+  }
+  if (next.type === 'grid') {
+    return {
+      ...next,
+      children: (next.children as any[]).map((child) => {
+        const { column, row, area, ...rest } = child as any;
+        const nextChild = applyTransformsToNode(rest as PrimitiveNode, transforms);
+        return { ...nextChild, ...(column ? { column } : {}), ...(row ? { row } : {}), ...(area ? { area } : {}) };
+      }) as any,
+    };
+  }
+  return next;
+}
+
+function mergeCanvasPreserveCurrent(next: PosterDefinition, current: PosterDefinition): PosterDefinition {
+  return {
+    ...next,
+    // Preserve user's canvas choice (preset/custom) across any regeneration.
+    canvas: { ...next.canvas, ...current.canvas },
+  };
+}
 
 /**
  * Preset function registry
@@ -56,28 +164,55 @@ function getPresetFunction(presetId: string) {
  * Design state interface
  */
 interface DesignState {
-  definition: PosterDefinition;
+  projectId: string | null;
+  designs: DesignDocument[];
+  activeDesignId: string;
+  previewDefinition: PosterDefinition | null;
   showGrid: boolean;
   previewScale: number;
+}
+
+export interface DesignDocument {
+  id: string;
+  name: string;
+  definition: PosterDefinition;
   selectedNodeId: string | null;
-  activePreset: string | null;
+  activePreset: string;
   presetOptions: Record<string, unknown>;
+  nodeTransforms: Record<string, NodeTransform>;
+  nodeOverrides: Record<string, NodeOverride>;
+  nodeInsertions: NodeInsertion[];
+  nodeDeletions: string[];
+  nodeOrders: NodeOrderMap;
+  createdAt: string;
+  updatedAt: string;
+  ai?: {
+    reasoning?: string;
+  };
 }
 
 /**
  * Design actions
  */
 type DesignAction =
-  | { type: 'SET_DEFINITION'; definition: PosterDefinition }
+  | { type: 'LOAD_PROJECT'; projectId: string; designs: DesignDocument[]; activeDesignId: string }
+  | { type: 'SET_PROJECT_ID'; projectId: string }
+  | { type: 'SET_ACTIVE_DESIGN'; designId: string }
+  | { type: 'ADD_DESIGN_FROM_PRESET'; presetId: string; options?: Record<string, unknown>; name?: string }
+  | { type: 'APPLY_AI_VARIANT_AS_DESIGN'; presetId: string; options: Record<string, unknown>; theme: ThemePreset; reasoning?: string }
   | { type: 'SET_THEME'; preset: ThemePreset }
   | { type: 'SET_CANVAS'; preset: CanvasPreset }
   | { type: 'SET_THEME_OVERRIDE'; key: string; value: string }
   | { type: 'TOGGLE_GRID' }
   | { type: 'SET_PREVIEW_SCALE'; scale: number }
   | { type: 'SELECT_NODE'; nodeId: string | null }
-  | { type: 'UPDATE_NODE'; nodeId: string; updates: Record<string, unknown> }
-  | { type: 'SET_PRESET'; presetId: string; options: Record<string, unknown> }
-  | { type: 'UPDATE_PRESET_OPTIONS'; updates: Record<string, unknown> };
+  | { type: 'UPDATE_NODE_TRANSFORM'; nodeId: string; dx: number; dy: number }
+  | { type: 'UPDATE_NODE_OVERRIDE'; nodeId: string; override: NodeOverride }
+  | { type: 'ADD_NODE'; parentId: string; node: PrimitiveNode; index?: number }
+  | { type: 'DELETE_NODE'; nodeId: string }
+  | { type: 'SET_NODE_ORDER'; parentId: string; orderedChildIds: string[] }
+  | { type: 'SET_PRESET_OPTIONS'; updates: Record<string, unknown> }
+  | { type: 'SET_PREVIEW_DEFINITION'; definition: PosterDefinition | null };
 
 /**
  * Initial preset
@@ -85,82 +220,216 @@ type DesignAction =
 const initialPresetId = 'statement-poster';
 const initialPresetOptions = presetSchemas[initialPresetId].defaultOptions;
 
-/**
- * Initial poster definition
- */
-const initialDefinition = createStatementPoster({
-  headline: initialPresetOptions.headline as string,
-  subheadline: initialPresetOptions.subheadline as string,
-  author: initialPresetOptions.author as string,
-  topic: initialPresetOptions.topic as string,
-  theme: 'swiss-red',
-});
+function buildDefinitionFromPreset(presetId: string, options: Record<string, unknown>): PosterDefinition {
+  const presetFn = getPresetFunction(presetId);
+  const base = presetFn(options);
+  return {
+    ...base,
+    root: withDeterministicNodeIds(base.root),
+  };
+}
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function createDesignFromPreset(presetId: string, options: Record<string, unknown>, name?: string): DesignDocument {
+  const ts = nowIso();
+  const definition = buildDefinitionFromPreset(presetId, options);
+  const designId = createId();
+  return {
+    id: designId,
+    name: name || presetSchemas[presetId]?.name || 'Untitled Design',
+    definition,
+    selectedNodeId: null,
+    activePreset: presetId,
+    presetOptions: options,
+    nodeTransforms: {},
+    nodeOverrides: {},
+    nodeInsertions: [],
+    nodeDeletions: [],
+    nodeOrders: {},
+    createdAt: ts,
+    updatedAt: ts,
+  };
+}
+
+function applyUserEdits(
+  definition: PosterDefinition,
+  design: Pick<DesignDocument, 'nodeOverrides' | 'nodeInsertions' | 'nodeDeletions' | 'nodeTransforms' | 'nodeOrders'>
+): PosterDefinition {
+  let root = withDeterministicNodeIds(definition.root);
+
+  root = applyInsertions(root, design.nodeInsertions);
+  root = applyDeletions(root, new Set(design.nodeDeletions));
+  root = applyOrders(root, design.nodeOrders);
+  root = applyOverrides(root, design.nodeOverrides);
+  root = applyTransformsToNode(root, design.nodeTransforms);
+
+  return {
+    ...definition,
+    root,
+  };
+}
 
 /**
  * Initial state
  */
 const initialState: DesignState = {
-  definition: initialDefinition,
+  projectId: null,
+  designs: [
+    createDesignFromPreset(initialPresetId, { ...initialPresetOptions, theme: 'swiss-red' }, 'Design 1'),
+  ],
+  activeDesignId: 'pending',
+  previewDefinition: null,
   showGrid: false,
   previewScale: 0.5,
-  selectedNodeId: null,
-  activePreset: initialPresetId,
-  presetOptions: { ...initialPresetOptions, theme: 'swiss-red' },
 };
+
+initialState.activeDesignId = initialState.designs[0].id;
 
 /**
  * Design reducer
  */
 function designReducer(state: DesignState, action: DesignAction): DesignState {
-  switch (action.type) {
-    case 'SET_DEFINITION':
-      return { ...state, definition: action.definition };
+  const activeIndex = state.designs.findIndex((d) => d.id === state.activeDesignId);
+  const activeDesign = activeIndex >= 0 ? state.designs[activeIndex] : state.designs[0];
 
-    case 'SET_THEME': {
-      const newOptions = { ...state.presetOptions, theme: action.preset };
-      if (state.activePreset) {
-        const presetFn = getPresetFunction(state.activePreset);
-        return {
-          ...state,
-          presetOptions: newOptions,
-          definition: presetFn(newOptions),
-        };
-      }
+  switch (action.type) {
+    case 'LOAD_PROJECT':
       return {
         ...state,
-        presetOptions: newOptions,
-        definition: {
-          ...state.definition,
-          theme: { preset: action.preset },
-        },
+        projectId: action.projectId,
+        designs: action.designs,
+        activeDesignId: action.activeDesignId,
       };
+
+    case 'SET_PROJECT_ID':
+      return { ...state, projectId: action.projectId };
+
+    case 'SET_ACTIVE_DESIGN':
+      return { ...state, activeDesignId: action.designId, previewDefinition: null };
+
+    case 'ADD_DESIGN_FROM_PRESET': {
+      const schema = presetSchemas[action.presetId];
+      const defaultOptions = schema?.defaultOptions || {};
+      const options = {
+        ...defaultOptions,
+        ...(action.options || {}),
+        theme: (activeDesign?.definition?.theme?.preset || 'swiss-red') as ThemePreset,
+      };
+
+      // Seed new design with the current canvas so the experience is consistent.
+      const base = buildDefinitionFromPreset(action.presetId, options);
+      const definition = mergeCanvasPreserveCurrent(base, activeDesign.definition);
+      const ts = nowIso();
+      const newDesign: DesignDocument = {
+        id: createId(),
+        name: action.name || schema?.name || 'Untitled Design',
+        definition,
+        selectedNodeId: null,
+        activePreset: action.presetId,
+        presetOptions: options,
+        nodeTransforms: {},
+        nodeOverrides: {},
+        nodeInsertions: [],
+        nodeDeletions: [],
+        nodeOrders: {},
+        createdAt: ts,
+        updatedAt: ts,
+      };
+      return {
+        ...state,
+        designs: [...state.designs, newDesign],
+        activeDesignId: newDesign.id,
+        previewDefinition: null,
+      };
+    }
+
+    case 'APPLY_AI_VARIANT_AS_DESIGN': {
+      const options = { ...action.options, theme: action.theme };
+      const base = buildDefinitionFromPreset(action.presetId, options);
+      const definition = mergeCanvasPreserveCurrent(base, activeDesign.definition);
+      const ts = nowIso();
+      const newDesign: DesignDocument = {
+        id: createId(),
+        name: presetSchemas[action.presetId]?.name || 'AI Design',
+        definition,
+        selectedNodeId: null,
+        activePreset: action.presetId,
+        presetOptions: options,
+        nodeTransforms: {},
+        nodeOverrides: {},
+        nodeInsertions: [],
+        nodeDeletions: [],
+        nodeOrders: {},
+        createdAt: ts,
+        updatedAt: ts,
+        ai: action.reasoning ? { reasoning: action.reasoning } : undefined,
+      };
+      return {
+        ...state,
+        designs: [...state.designs, newDesign],
+        activeDesignId: newDesign.id,
+        previewDefinition: null,
+      };
+    }
+
+    case 'SET_THEME': {
+      if (!activeDesign) return state;
+      const newOptions = { ...activeDesign.presetOptions, theme: action.preset };
+      const base = buildDefinitionFromPreset(activeDesign.activePreset, newOptions);
+      const merged = mergeCanvasPreserveCurrent(base, activeDesign.definition);
+      const withEdits = applyUserEdits(merged, activeDesign);
+
+      const nextDesign: DesignDocument = {
+        ...activeDesign,
+        presetOptions: newOptions,
+        definition: withEdits,
+        updatedAt: nowIso(),
+      };
+      const designs = [...state.designs];
+      designs[activeIndex] = nextDesign;
+      return { ...state, designs, previewDefinition: null };
     }
 
     case 'SET_CANVAS': {
-      const newDefinition = {
-        ...state.definition,
+      if (!activeDesign) return state;
+      const newDefinition: PosterDefinition = {
+        ...activeDesign.definition,
         canvas: { preset: action.preset },
       };
-      return {
-        ...state,
+      const nextDesign: DesignDocument = {
+        ...activeDesign,
         definition: newDefinition,
+        updatedAt: nowIso(),
       };
+      const designs = [...state.designs];
+      designs[activeIndex] = nextDesign;
+      return { ...state, designs };
     }
 
     case 'SET_THEME_OVERRIDE':
-      return {
-        ...state,
-        definition: {
-          ...state.definition,
-          theme: {
-            ...state.definition.theme,
-            overrides: {
-              ...state.definition.theme.overrides,
-              [action.key]: action.value,
+      if (!activeDesign) return state;
+      {
+        const nextDesign: DesignDocument = {
+          ...activeDesign,
+          definition: {
+            ...activeDesign.definition,
+            theme: {
+              ...activeDesign.definition.theme,
+              overrides: {
+                ...activeDesign.definition.theme.overrides,
+                [action.key]: action.value,
+              },
             },
           },
-        },
-      };
+          updatedAt: nowIso(),
+        };
+        const designs = [...state.designs];
+        designs[activeIndex] = nextDesign;
+        return { ...state, designs };
+      }
 
     case 'TOGGLE_GRID':
       return { ...state, showGrid: !state.showGrid };
@@ -169,35 +438,172 @@ function designReducer(state: DesignState, action: DesignAction): DesignState {
       return { ...state, previewScale: action.scale };
 
     case 'SELECT_NODE':
-      return { ...state, selectedNodeId: action.nodeId };
+      if (!activeDesign) return state;
+      {
+        const nextDesign: DesignDocument = {
+          ...activeDesign,
+          selectedNodeId: action.nodeId,
+          updatedAt: nowIso(),
+        };
+        const designs = [...state.designs];
+        designs[activeIndex] = nextDesign;
+        return { ...state, designs };
+      }
 
-    case 'UPDATE_NODE':
-      return state;
+    case 'UPDATE_NODE_TRANSFORM':
+      if (!activeDesign) return state;
+      {
+        const current = activeDesign.nodeTransforms[action.nodeId] || { x: 0, y: 0 };
+        const nextTransforms = {
+          ...activeDesign.nodeTransforms,
+          [action.nodeId]: { x: current.x + action.dx, y: current.y + action.dy },
+        };
 
-    case 'SET_PRESET': {
-      const presetFn = getPresetFunction(action.presetId);
-      const optionsWithTheme = {
-        ...action.options,
-        theme: state.presetOptions.theme || 'swiss-red',
-      };
-      return {
-        ...state,
-        activePreset: action.presetId,
-        presetOptions: optionsWithTheme,
-        definition: presetFn(optionsWithTheme),
-      };
-    }
+        // Re-apply transforms to definition.root so export + render stays consistent.
+        const withTransforms: PosterDefinition = {
+          ...activeDesign.definition,
+          root: applyTransformsToNode(activeDesign.definition.root, nextTransforms),
+        };
 
-    case 'UPDATE_PRESET_OPTIONS': {
-      if (!state.activePreset) return state;
-      const newOptions = { ...state.presetOptions, ...action.updates };
-      const presetFn = getPresetFunction(state.activePreset);
-      return {
-        ...state,
+        const nextDesign: DesignDocument = {
+          ...activeDesign,
+          nodeTransforms: nextTransforms,
+          definition: withTransforms,
+          updatedAt: nowIso(),
+        };
+
+        const designs = [...state.designs];
+        designs[activeIndex] = nextDesign;
+        return { ...state, designs };
+      }
+
+    case 'UPDATE_NODE_OVERRIDE':
+      if (!activeDesign) return state;
+      {
+        const nextOverrides: Record<string, NodeOverride> = {
+          ...activeDesign.nodeOverrides,
+          [action.nodeId]: {
+            ...(activeDesign.nodeOverrides[action.nodeId] || {}),
+            ...action.override,
+            ...(action.override.style
+              ? { style: { ...(activeDesign.nodeOverrides[action.nodeId]?.style || {}), ...action.override.style } }
+              : {}),
+          },
+        };
+
+        const nextDefinition = applyUserEdits(activeDesign.definition, {
+          nodeOverrides: nextOverrides,
+          nodeInsertions: activeDesign.nodeInsertions,
+          nodeDeletions: activeDesign.nodeDeletions,
+          nodeTransforms: activeDesign.nodeTransforms,
+          nodeOrders: activeDesign.nodeOrders,
+        });
+
+        const nextDesign: DesignDocument = {
+          ...activeDesign,
+          nodeOverrides: nextOverrides,
+          definition: nextDefinition,
+          updatedAt: nowIso(),
+        };
+        const designs = [...state.designs];
+        designs[activeIndex] = nextDesign;
+        return { ...state, designs };
+      }
+
+    case 'ADD_NODE':
+      if (!activeDesign) return state;
+      {
+        const baseNode = action.node.id ? action.node : { ...action.node, id: createId() };
+        const node = withDeterministicNodeIds(baseNode, [baseNode.id || 'new']);
+        const nextInsertions = [...activeDesign.nodeInsertions, { parentId: action.parentId, node, index: action.index }];
+        const nextDefinition = applyUserEdits(activeDesign.definition, {
+          nodeOverrides: activeDesign.nodeOverrides,
+          nodeInsertions: nextInsertions,
+          nodeDeletions: activeDesign.nodeDeletions,
+          nodeTransforms: activeDesign.nodeTransforms,
+          nodeOrders: activeDesign.nodeOrders,
+        });
+        const nextDesign: DesignDocument = {
+          ...activeDesign,
+          nodeInsertions: nextInsertions,
+          definition: nextDefinition,
+          selectedNodeId: node.id || null,
+          updatedAt: nowIso(),
+        };
+        const designs = [...state.designs];
+        designs[activeIndex] = nextDesign;
+        return { ...state, designs };
+      }
+
+    case 'DELETE_NODE':
+      if (!activeDesign) return state;
+      {
+        const nextDeletions = Array.from(new Set([...activeDesign.nodeDeletions, action.nodeId]));
+        const nextDefinition = applyUserEdits(activeDesign.definition, {
+          nodeOverrides: activeDesign.nodeOverrides,
+          nodeInsertions: activeDesign.nodeInsertions,
+          nodeDeletions: nextDeletions,
+          nodeTransforms: activeDesign.nodeTransforms,
+          nodeOrders: activeDesign.nodeOrders,
+        });
+        const nextDesign: DesignDocument = {
+          ...activeDesign,
+          nodeDeletions: nextDeletions,
+          definition: nextDefinition,
+          selectedNodeId: activeDesign.selectedNodeId === action.nodeId ? null : activeDesign.selectedNodeId,
+          updatedAt: nowIso(),
+        };
+        const designs = [...state.designs];
+        designs[activeIndex] = nextDesign;
+        return { ...state, designs };
+      }
+
+    case 'SET_NODE_ORDER':
+      if (!activeDesign) return state;
+      {
+        const nextOrders: NodeOrderMap = {
+          ...activeDesign.nodeOrders,
+          [action.parentId]: action.orderedChildIds,
+        };
+        const nextDefinition = applyUserEdits(activeDesign.definition, {
+          nodeOverrides: activeDesign.nodeOverrides,
+          nodeInsertions: activeDesign.nodeInsertions,
+          nodeDeletions: activeDesign.nodeDeletions,
+          nodeTransforms: activeDesign.nodeTransforms,
+          nodeOrders: nextOrders,
+        });
+
+        const nextDesign: DesignDocument = {
+          ...activeDesign,
+          nodeOrders: nextOrders,
+          definition: nextDefinition,
+          updatedAt: nowIso(),
+        };
+        const designs = [...state.designs];
+        designs[activeIndex] = nextDesign;
+        return { ...state, designs };
+      }
+
+    case 'SET_PRESET_OPTIONS': {
+      if (!activeDesign) return state;
+      const newOptions = { ...activeDesign.presetOptions, ...action.updates };
+      const base = buildDefinitionFromPreset(activeDesign.activePreset, newOptions);
+      const merged = mergeCanvasPreserveCurrent(base, activeDesign.definition);
+      const withEdits = applyUserEdits(merged, activeDesign);
+
+      const nextDesign: DesignDocument = {
+        ...activeDesign,
         presetOptions: newOptions,
-        definition: presetFn(newOptions),
+        definition: withEdits,
+        updatedAt: nowIso(),
       };
+      const designs = [...state.designs];
+      designs[activeIndex] = nextDesign;
+      return { ...state, designs, previewDefinition: null };
     }
+
+    case 'SET_PREVIEW_DEFINITION':
+      return { ...state, previewDefinition: action.definition };
 
     default:
       return state;
@@ -210,14 +616,25 @@ function designReducer(state: DesignState, action: DesignAction): DesignState {
 interface DesignContextValue {
   state: DesignState;
   dispatch: React.Dispatch<DesignAction>;
+  activeDesign: DesignDocument;
+  displayedDefinition: PosterDefinition;
+  setActiveDesign: (designId: string) => void;
+  addDesignFromPreset: (presetId: string, options?: Record<string, unknown>, name?: string) => void;
+  applyAIVariantAsDesign: (presetId: string, options: Record<string, unknown>, theme: ThemePreset, reasoning?: string) => void;
   setTheme: (preset: ThemePreset) => void;
   setCanvas: (preset: CanvasPreset) => void;
-  setDefinition: (definition: PosterDefinition) => void;
   toggleGrid: () => void;
   setPreviewScale: (scale: number) => void;
-  setPreset: (presetId: string, options?: Record<string, unknown>) => void;
   updatePresetOption: (key: string, value: unknown) => void;
   updatePresetOptions: (updates: Record<string, unknown>) => void;
+  selectNode: (nodeId: string | null) => void;
+  nudgeNode: (nodeId: string, dx: number, dy: number) => void;
+  updateNodeOverride: (nodeId: string, override: NodeOverride) => void;
+  addNode: (parentId: string, node: PrimitiveNode, index?: number) => void;
+  deleteNode: (nodeId: string) => void;
+  setNodeOrder: (parentId: string, orderedChildIds: string[]) => void;
+  getSelectedNode: () => PrimitiveNode | null;
+  setPreviewDefinition: (definition: PosterDefinition | null) => void;
 }
 
 const DesignContext = createContext<DesignContextValue | null>(null);
@@ -228,29 +645,197 @@ const DesignContext = createContext<DesignContextValue | null>(null);
 export function DesignProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(designReducer, initialState);
 
+  const activeDesign = useMemo(() => {
+    const found = state.designs.find((d) => d.id === state.activeDesignId);
+    return found || state.designs[0];
+  }, [state.designs, state.activeDesignId]);
+
+  const displayedDefinition = state.previewDefinition || activeDesign.definition;
+
+  const loadedFromServerRef = useRef(false);
+  const saveTimerRef = useRef<number | null>(null);
+
+  // Load or create a project in MongoDB
+  useEffect(() => {
+    if (loadedFromServerRef.current) return;
+    loadedFromServerRef.current = true;
+
+    const run = async () => {
+      let storedProjectId: string | null = null;
+      try {
+        storedProjectId = localStorage.getItem('swiss-project-id');
+      } catch {
+        storedProjectId = null;
+      }
+
+      if (storedProjectId) {
+        try {
+          const res = await fetch(`/api/projects/${storedProjectId}`);
+          if (res.ok) {
+            const json = await res.json();
+            const project = json?.project;
+            if (project?.id && Array.isArray(project?.designs) && typeof project?.activeDesignId === 'string') {
+              const normalizedDesigns: DesignDocument[] = (project.designs as any[]).map((d, idx) => {
+                const def = (d?.definition || d?.def || d) as PosterDefinition;
+                const presetId = typeof d?.activePreset === 'string' ? d.activePreset : initialPresetId;
+                const presetOptions = typeof d?.presetOptions === 'object' && d?.presetOptions ? d.presetOptions : {};
+                const nodeTransforms = typeof d?.nodeTransforms === 'object' && d?.nodeTransforms ? d.nodeTransforms : {};
+                const nodeOverrides = typeof d?.nodeOverrides === 'object' && d?.nodeOverrides ? d.nodeOverrides : {};
+                const nodeInsertions = Array.isArray(d?.nodeInsertions) ? d.nodeInsertions : [];
+                const nodeDeletions = Array.isArray(d?.nodeDeletions) ? d.nodeDeletions : [];
+                const nodeOrders = typeof d?.nodeOrders === 'object' && d?.nodeOrders ? d.nodeOrders : {};
+                const baseRoot = def?.root ? withDeterministicNodeIds(def.root) : withDeterministicNodeIds(activeDesign.definition.root);
+
+                const normalizedDef = applyUserEdits(
+                  {
+                    ...(def || activeDesign.definition),
+                    root: baseRoot,
+                  },
+                  {
+                    nodeOverrides,
+                    nodeInsertions,
+                    nodeDeletions,
+                    nodeTransforms,
+                    nodeOrders,
+                  }
+                );
+                return {
+                  id: typeof d?.id === 'string' ? d.id : createId(),
+                  name: typeof d?.name === 'string' ? d.name : `Design ${idx + 1}`,
+                  definition: normalizedDef,
+                  selectedNodeId: d?.selectedNodeId ?? null,
+                  activePreset: presetId,
+                  presetOptions,
+                  nodeTransforms,
+                  nodeOverrides,
+                  nodeInsertions,
+                  nodeDeletions,
+                  nodeOrders,
+                  createdAt: typeof d?.createdAt === 'string' ? d.createdAt : nowIso(),
+                  updatedAt: typeof d?.updatedAt === 'string' ? d.updatedAt : nowIso(),
+                  ai: typeof d?.ai === 'object' ? d.ai : undefined,
+                };
+              });
+
+              const resolvedActiveId = normalizedDesigns.some((d) => d.id === project.activeDesignId)
+                ? project.activeDesignId
+                : normalizedDesigns[0]?.id;
+
+              dispatch({
+                type: 'LOAD_PROJECT',
+                projectId: project.id,
+                designs: normalizedDesigns,
+                activeDesignId: resolvedActiveId,
+              });
+              return;
+            }
+          }
+        } catch {
+          // fall through to create
+        }
+      }
+
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ designs: state.designs, activeDesignId: state.activeDesignId }),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const project = json?.project;
+          if (project?.id) {
+            dispatch({ type: 'SET_PROJECT_ID', projectId: project.id });
+          }
+        }
+      } catch {
+        // ignore (offline / db not reachable)
+      }
+    };
+
+    void run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-save project (debounced)
+  useEffect(() => {
+    if (!state.projectId) return;
+
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+    }
+
+    saveTimerRef.current = window.setTimeout(async () => {
+      try {
+        await fetch(`/api/projects/${state.projectId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ designs: state.designs, activeDesignId: state.activeDesignId }),
+        });
+      } catch {
+        // ignore
+      }
+    }, 800);
+
+    return () => {
+      if (saveTimerRef.current) {
+        window.clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, [state.projectId, state.designs, state.activeDesignId]);
+
+  // Persist project id in localStorage (Mongo persistence is handled by a separate effect in the app layer)
+  useEffect(() => {
+    if (state.projectId) {
+      try {
+        localStorage.setItem('swiss-project-id', state.projectId);
+      } catch {
+        // ignore
+      }
+    }
+  }, [state.projectId]);
+
+  // Initialize activeDesignId if needed
+  const didInitRef = useRef(false);
+  useEffect(() => {
+    if (didInitRef.current) return;
+    if (state.activeDesignId === 'pending' && state.designs[0]) {
+      didInitRef.current = true;
+      dispatch({ type: 'SET_ACTIVE_DESIGN', designId: state.designs[0].id });
+    }
+  }, [state.activeDesignId, state.designs]);
+
   const value: DesignContextValue = {
     state,
     dispatch,
+    activeDesign,
+    displayedDefinition,
+    setActiveDesign: (designId) => dispatch({ type: 'SET_ACTIVE_DESIGN', designId }),
+    addDesignFromPreset: (presetId, options, name) => dispatch({ type: 'ADD_DESIGN_FROM_PRESET', presetId, options, name }),
+    applyAIVariantAsDesign: (presetId, options, theme, reasoning) =>
+      dispatch({ type: 'APPLY_AI_VARIANT_AS_DESIGN', presetId, options, theme, reasoning }),
     setTheme: (preset) => dispatch({ type: 'SET_THEME', preset }),
     setCanvas: (preset) => dispatch({ type: 'SET_CANVAS', preset }),
-    setDefinition: (definition) => dispatch({ type: 'SET_DEFINITION', definition }),
     toggleGrid: () => dispatch({ type: 'TOGGLE_GRID' }),
     setPreviewScale: (scale) => dispatch({ type: 'SET_PREVIEW_SCALE', scale }),
-    setPreset: (presetId, options) => {
-      const schema = presetSchemas[presetId];
-      const defaultOptions = schema?.defaultOptions || {};
-      dispatch({
-        type: 'SET_PRESET',
-        presetId,
-        options: options || defaultOptions,
-      });
-    },
     updatePresetOption: (key, value) => {
-      dispatch({ type: 'UPDATE_PRESET_OPTIONS', updates: { [key]: value } });
+      dispatch({ type: 'SET_PRESET_OPTIONS', updates: { [key]: value } });
     },
     updatePresetOptions: (updates) => {
-      dispatch({ type: 'UPDATE_PRESET_OPTIONS', updates });
+      dispatch({ type: 'SET_PRESET_OPTIONS', updates });
     },
+    selectNode: (nodeId) => dispatch({ type: 'SELECT_NODE', nodeId }),
+    nudgeNode: (nodeId, dx, dy) => dispatch({ type: 'UPDATE_NODE_TRANSFORM', nodeId, dx, dy }),
+    updateNodeOverride: (nodeId, override) => dispatch({ type: 'UPDATE_NODE_OVERRIDE', nodeId, override }),
+    addNode: (parentId, node, index) => dispatch({ type: 'ADD_NODE', parentId, node, index }),
+    deleteNode: (nodeId) => dispatch({ type: 'DELETE_NODE', nodeId }),
+    setNodeOrder: (parentId, orderedChildIds) => dispatch({ type: 'SET_NODE_ORDER', parentId, orderedChildIds }),
+    getSelectedNode: () => {
+      const id = activeDesign.selectedNodeId;
+      if (!id) return null;
+      return findNodeById(activeDesign.definition.root, id);
+    },
+    setPreviewDefinition: (definition) => dispatch({ type: 'SET_PREVIEW_DEFINITION', definition }),
   };
 
   return <DesignContext.Provider value={value}>{children}</DesignContext.Provider>;

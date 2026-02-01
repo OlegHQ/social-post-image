@@ -1,0 +1,15 @@
+[Unit]
+Description=Swiss Content Generator (Next.js)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=__APP_DIR__
+EnvironmentFile=%h/.config/swiss-content-generator/env
+
+ExecStart=${NODE_BIN} __APP_DIR__/node_modules/next/dist/bin/next start -p ${PORT} -H ${BIND_ADDR}
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

@@ -28,6 +28,7 @@ export function Box({
   minHeight,
   className,
   style,
+  dataNodeId,
 }: BoxProps) {
   const computedStyle: React.CSSProperties = {
     // Padding
@@ -66,7 +67,7 @@ export function Box({
   };
 
   return (
-    <div className={clsx('swiss-box', className)} style={computedStyle}>
+    <div className={clsx('swiss-box', className)} style={computedStyle} data-node-id={dataNodeId}>
       {children}
     </div>
   );
