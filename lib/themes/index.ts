@@ -2,27 +2,6 @@
  * Swiss Design System - Theme Exports
  */
 
-export * from './types';
-export { swissRed } from './swiss-red';
-export { kleinBlue } from './klein-blue';
-export { monochrome } from './monochrome';
-export { vignelliGold } from './vignelli-gold';
-export { vignelliCream } from './vignelli-cream';
-export { neueTeal } from './neue-teal';
-export { orangeEnergy } from './orange-energy';
-export { midnightGold } from './midnight-gold';
-export { forestContrast } from './forest-contrast';
-export { brutalistConcrete } from './brutalist-concrete';
-export { techTerminal } from './tech-terminal';
-export { paperInk } from './paper-ink';
-export { swissRedInverted } from './swiss-red-inverted';
-export { neonGreen } from './neon-green';
-export { ramsBrown } from './rams-brown';
-export { tufteBlue } from './tufte-blue';
-export { empatiaMint } from './empatia-mint';
-export { vignelliOrange } from './vignelli-orange';
-export { ramsWarm } from './rams-warm';
-
 import type { Theme } from './types';
 import { swissRed } from './swiss-red';
 import { kleinBlue } from './klein-blue';
@@ -43,6 +22,32 @@ import { tufteBlue } from './tufte-blue';
 import { empatiaMint } from './empatia-mint';
 import { vignelliOrange } from './vignelli-orange';
 import { ramsWarm } from './rams-warm';
+
+// Re-export types
+export * from './types';
+
+// Re-export individual themes
+export {
+  swissRed,
+  kleinBlue,
+  monochrome,
+  vignelliGold,
+  vignelliCream,
+  neueTeal,
+  orangeEnergy,
+  midnightGold,
+  forestContrast,
+  brutalistConcrete,
+  techTerminal,
+  paperInk,
+  swissRedInverted,
+  neonGreen,
+  ramsBrown,
+  tufteBlue,
+  empatiaMint,
+  vignelliOrange,
+  ramsWarm,
+};
 
 // Theme registry
 export const themes: Record<string, Theme> = {
@@ -69,7 +74,6 @@ export const themes: Record<string, Theme> = {
 
 export type ThemePreset = keyof typeof themes;
 
-// Get theme by ID
 export function getTheme(id: ThemePreset | string): Theme {
   const theme = themes[id];
   if (!theme) {
@@ -79,7 +83,6 @@ export function getTheme(id: ThemePreset | string): Theme {
   return theme;
 }
 
-// Create custom theme with overrides
 export function createTheme(
   baseId: ThemePreset | string,
   overrides: Partial<Theme['colors']>
@@ -95,7 +98,6 @@ export function createTheme(
   };
 }
 
-// Generate CSS custom properties from theme
 export function generateThemeCSS(theme: Theme): string {
   return `
     --color-background: ${theme.colors.background};

@@ -1776,52 +1776,6 @@ export function getTemplateIds(): string[] {
 }
 
 /**
- * Generate a prompt for an LLM to create a template configuration
- */
-export function generateLLMPrompt(templateId: string, context: string): string {
-  const spec = templateSpecs[templateId];
-  if (!spec) {
-    throw new Error(`Unknown template: ${templateId}`);
-  }
-
-  const requiredFields = Object.entries(spec.fieldGuides)
-    .filter(([, guide]) => guide.required)
-    .map(([key]) => key);
-
-  return `
-Generate a JSON configuration for a "${spec.name}" poster.
-
-TEMPLATE: ${spec.id}
-DESCRIPTION: ${spec.description}
-BEST FOR: ${spec.bestFor.join(', ')}
-LINKEDIN CONTEXT: ${spec.linkedInContext}
-
-USER'S CONTENT:
-${context}
-
-REQUIRED FIELDS: ${requiredFields.join(', ')}
-
-FIELD GUIDELINES:
-${Object.entries(spec.fieldGuides)
-  .map(([key, guide]) => {
-    let desc = `- ${key}: ${guide.description}`;
-    if (guide.maxChars) desc += ` (max ${guide.maxChars} chars)`;
-    if (guide.required) desc += ' [REQUIRED]';
-    return desc;
-  })
-  .join('\n')}
-
-EXAMPLE CONFIG:
-${JSON.stringify(spec.exampleConfig, null, 2)}
-
-DESIGN NOTES:
-${spec.designNotes.map(n => `- ${n}`).join('\n')}
-
-Please generate a valid JSON configuration object with appropriate content based on the user's input.
-`.trim();
-}
-
-/**
  * Validate a configuration against a template spec
  */
 export function validateConfig(

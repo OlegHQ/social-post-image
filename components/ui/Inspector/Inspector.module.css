@@ -1,8 +1,5 @@
 .inspector {
-  border: 1px solid var(--ui-border);
-  background: var(--ui-bg-tertiary);
-  border-radius: 6px;
-  padding: 12px;
+  /* Now inside a panel, no container styling needed */
 }
 
 .emptyTitle {
@@ -34,7 +31,6 @@
   display: flex;
   gap: 6px;
   align-items: center;
-  margin-top: 4px;
 }
 
 .pill {

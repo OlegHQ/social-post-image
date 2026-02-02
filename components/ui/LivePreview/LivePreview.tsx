@@ -53,8 +53,8 @@ export function LivePreview() {
     if (!dragRef.current) return;
     if (activeDesign.selectedNodeId !== dragRef.current.nodeId) return;
 
-    const dx = e.clientX - dragRef.current.startX;
-    const dy = e.clientY - dragRef.current.startY;
+    const dx = (e.clientX - dragRef.current.startX) / state.previewScale;
+    const dy = (e.clientY - dragRef.current.startY) / state.previewScale;
     if (dx === 0 && dy === 0) return;
 
     dragRef.current.startX = e.clientX;

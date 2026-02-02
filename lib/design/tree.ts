@@ -42,12 +42,10 @@ export function findParentInfo(
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
       if (child.id === nodeId) return { parentId: root.id || '', index: i };
-      const { column, row, area, ...rest } = child;
-      const found = findParentInfo(rest as PrimitiveNode, nodeId);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { column, row, area, ...nodeWithoutGridProps } = child;
+      const found = findParentInfo(nodeWithoutGridProps as PrimitiveNode, nodeId);
       if (found) return found;
-      void column;
-      void row;
-      void area;
     }
   }
   return null;
@@ -70,12 +68,10 @@ export function findNodeById(root: PrimitiveNode, nodeId: string): PrimitiveNode
   }
   if (root.type === 'grid') {
     for (const child of root.children as unknown as GridChild[]) {
-      const { column, row, area, ...rest } = child;
-      const found = findNodeById(rest as PrimitiveNode, nodeId);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { column, row, area, ...nodeWithoutGridProps } = child;
+      const found = findNodeById(nodeWithoutGridProps as PrimitiveNode, nodeId);
       if (found) return found;
-      void column;
-      void row;
-      void area;
     }
   }
 

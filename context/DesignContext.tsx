@@ -11,7 +11,6 @@ import {
   type NodeOverride,
   type NodeOrderMap,
   findNodeById,
-  findParentInfo,
 } from '@/lib/design/tree';
 import {
   createStatementPoster,
@@ -199,6 +198,7 @@ type DesignAction =
   | { type: 'SET_PROJECT_ID'; projectId: string }
   | { type: 'SET_ACTIVE_DESIGN'; designId: string }
   | { type: 'ADD_DESIGN_FROM_PRESET'; presetId: string; options?: Record<string, unknown>; name?: string }
+  | { type: 'DELETE_DESIGN'; designId: string }
   | { type: 'APPLY_AI_VARIANT_AS_DESIGN'; presetId: string; options: Record<string, unknown>; theme: ThemePreset; reasoning?: string }
   | { type: 'SET_THEME'; preset: ThemePreset }
   | { type: 'SET_CANVAS'; preset: CanvasPreset }
@@ -342,6 +342,21 @@ function designReducer(state: DesignState, action: DesignAction): DesignState {
         ...state,
         designs: [...state.designs, newDesign],
         activeDesignId: newDesign.id,
+        previewDefinition: null,
+      };
+    }
+
+    case 'DELETE_DESIGN': {
+      // Prevent deleting the last design
+      if (state.designs.length <= 1) return state;
+      const nextDesigns = state.designs.filter((d) => d.id !== action.designId);
+      // If deleting the active design, switch to the first remaining design
+      const nextActiveId =
+        state.activeDesignId === action.designId ? nextDesigns[0]?.id || state.activeDesignId : state.activeDesignId;
+      return {
+        ...state,
+        designs: nextDesigns,
+        activeDesignId: nextActiveId,
         previewDefinition: null,
       };
     }
@@ -620,6 +635,7 @@ interface DesignContextValue {
   displayedDefinition: PosterDefinition;
   setActiveDesign: (designId: string) => void;
   addDesignFromPreset: (presetId: string, options?: Record<string, unknown>, name?: string) => void;
+  deleteDesign: (designId: string) => void;
   applyAIVariantAsDesign: (presetId: string, options: Record<string, unknown>, theme: ThemePreset, reasoning?: string) => void;
   setTheme: (preset: ThemePreset) => void;
   setCanvas: (preset: CanvasPreset) => void;
@@ -812,6 +828,7 @@ export function DesignProvider({ children }: { children: ReactNode }) {
     displayedDefinition,
     setActiveDesign: (designId) => dispatch({ type: 'SET_ACTIVE_DESIGN', designId }),
     addDesignFromPreset: (presetId, options, name) => dispatch({ type: 'ADD_DESIGN_FROM_PRESET', presetId, options, name }),
+    deleteDesign: (designId) => dispatch({ type: 'DELETE_DESIGN', designId }),
     applyAIVariantAsDesign: (presetId, options, theme, reasoning) =>
       dispatch({ type: 'APPLY_AI_VARIANT_AS_DESIGN', presetId, options, theme, reasoning }),
     setTheme: (preset) => dispatch({ type: 'SET_THEME', preset }),
